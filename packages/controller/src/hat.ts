@@ -48,9 +48,9 @@ export const Hat = {
   TopLeft: 7,
 
   /**
-   * Represents the center direction
+   * Represents the neutral direction
    */
-  Center: 8,
+  Neutral: 8,
 } as const;
 
 /**
