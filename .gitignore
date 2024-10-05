@@ -1,4 +1,11 @@
 .idea
+.vscode
 
 node_modules/
+dist/
+
+# Nx
 .nx/cache
+.nx/workspace-data
+
+.DS_Store
