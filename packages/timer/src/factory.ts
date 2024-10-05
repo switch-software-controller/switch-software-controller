@@ -1,10 +1,10 @@
-import type { Timer } from "@switch-software-controller/timer-api";
-import { TimerImpl } from "./timer";
+import { type Timer, TimerImpl } from "./timer";
 
-/* v8 ignore next 3 */
+/* v8 ignore start */
 function getSecondsElapsedSinceEpoch() {
   return Math.trunc(Date.now() / 1000);
 }
+/* v8 ignore stop */
 
 /**
  * Creates a default timer instance.

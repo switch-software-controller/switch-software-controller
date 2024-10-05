@@ -1,5 +1,5 @@
 {
-  "name": "@switch-software-controller/timer-api",
+  "name": "@switch-software-controller/controller",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",

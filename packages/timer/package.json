@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.3",
-    "@switch-software-controller/timer-api": "*",
     "@vitest/coverage-v8": "^2.1.2",
     "typescript": "^5.5.3",
     "vite": "^5.4.8",
