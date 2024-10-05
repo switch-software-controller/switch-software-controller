@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, test } from "vitest";
-import { ControllerState, StateSerializerImpl } from './state.ts';
-import { StickTiltPreset, StickTiltRange } from './stick-tilt.ts';
-import { Hat } from './hat.ts';
-import { Button } from './button.ts';
+import { Button } from "./button.ts";
+import { Hat } from "./hat.ts";
+import { ControllerState, StateSerializerImpl } from "./state.ts";
+import { StickTiltPreset, StickTiltRange } from "./stick-tilt.ts";
 
 describe(ControllerState, () => {
   let state: ControllerState;
@@ -23,56 +23,56 @@ describe(ControllerState, () => {
   });
 
   describe("state.buttons", () => {
-    describe('hold', () => {
-      it('should set the value of the buttons', () => {
+    describe("hold", () => {
+      it("should set the value of the buttons", () => {
         state.buttons.hold([Button.A, Button.B]);
         expect(state.buttons.value).toBe(Button.A | Button.B);
       });
 
-      it('should idempotent hold Button.Noop', () => {
+      it("should idempotent hold Button.Noop", () => {
         state.buttons.hold([Button.Noop]);
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
-      it('should idempotent hold Button.Noop', () => {
+      it("should idempotent hold Button.Noop", () => {
         state.buttons.hold([Button.A, Button.B]);
         state.buttons.hold([Button.Noop]);
         expect(state.buttons.value).toBe(Button.A | Button.B);
       });
     });
 
-    describe('release', () => {
-      it('should set the value of the buttons', () => {
+    describe("release", () => {
+      it("should set the value of the buttons", () => {
         state.buttons.hold([Button.A, Button.B]);
         state.buttons.release([Button.A]);
         expect(state.buttons.value).toBe(Button.B);
       });
 
-      it('should idempotent release Button.Noop', () => {
+      it("should idempotent release Button.Noop", () => {
         state.buttons.release([Button.Noop]);
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
-      it('should idempotent release Button.Noop', () => {
+      it("should idempotent release Button.Noop", () => {
         state.buttons.hold([Button.A, Button.B]);
         state.buttons.release([Button.Noop]);
         expect(state.buttons.value).toBe(Button.A | Button.B);
       });
     });
 
-    describe('releaseAll', () => {
-      it('should set the value of the buttons', () => {
+    describe("releaseAll", () => {
+      it("should set the value of the buttons", () => {
         state.buttons.hold([Button.A, Button.B]);
         state.buttons.releaseAll();
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
-      it('should idempotent releaseAll if initial state', () => {
+      it("should idempotent releaseAll if initial state", () => {
         state.buttons.releaseAll();
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
-      it('should idempotent releaseAll if already reset', () => {
+      it("should idempotent releaseAll if already reset", () => {
         state.buttons.hold([Button.A, Button.B]);
         state.buttons.releaseAll();
         state.buttons.releaseAll();
@@ -112,54 +112,54 @@ describe(ControllerState, () => {
   describe("sticks of state", () => {
     describe("tilt", () => {
       it("should not dirty if not tilt changed", () => {
-        [state.lStick, state.rStick].forEach(stick => {
+        for (const stick of [state.lStick, state.rStick]) {
           stick.tilt = StickTiltPreset.Neutral;
           expect(stick.x).toBe(StickTiltRange.Center);
           expect(stick.y).toBe(StickTiltRange.Center);
           expect(stick.isDirty).toBe(false);
-        });
+        }
       });
 
       it("should dirty if tilt changed", () => {
-        [state.lStick, state.rStick].forEach(stick => {
+        for (const stick of [state.lStick, state.rStick]) {
           stick.tilt = StickTiltPreset.Top;
           expect(stick.x).toBe(StickTiltPreset.Top.x);
           expect(stick.y).toBe(StickTiltPreset.Top.y);
           expect(stick.isDirty).toBe(true);
-        });
+        }
       });
     });
 
     describe("consume", () => {
       it("should not dirty if not consume", () => {
-        [state.lStick, state.rStick].forEach(stick => {
+        for (const stick of [state.lStick, state.rStick]) {
           stick.tilt = StickTiltPreset.Top;
           expect(stick.isDirty).toBe(true);
-        });
+        }
       });
 
       it("should not dirty if consume", () => {
-        [state.lStick, state.rStick].forEach(stick => {
+        for (const stick of [state.lStick, state.rStick]) {
           stick.tilt = StickTiltPreset.Top;
           expect(stick.isDirty).toBe(true);
           stick.consume();
           expect(stick.isDirty).toBe(false);
-        });
+        }
       });
     });
 
     describe("toNeutral", () => {
       it("should not dirty if tilt is already neutral", () => {
-        [state.lStick, state.rStick].forEach(stick => {
+        for (const stick of [state.lStick, state.rStick]) {
           stick.toNeutral();
           expect(stick.x).toBe(StickTiltRange.Center);
           expect(stick.y).toBe(StickTiltRange.Center);
           expect(stick.isDirty).toBe(false);
-        });
+        }
       });
 
       it("should dirty if tilt is not neutral", () => {
-        [state.lStick, state.rStick].forEach(stick => {
+        for (const stick of [state.lStick, state.rStick]) {
           stick.tilt = StickTiltPreset.Top;
           expect(stick.isDirty).toBe(true);
           stick.consume();
@@ -168,7 +168,7 @@ describe(ControllerState, () => {
           expect(stick.x).toBe(StickTiltRange.Center);
           expect(stick.y).toBe(StickTiltRange.Center);
           expect(stick.isDirty).toBe(true);
-        });
+        }
       });
     });
   });
@@ -186,7 +186,7 @@ describe(ControllerState, () => {
     });
   });
 
-  describe("resetAll", ()    => {
+  describe("resetAll", () => {
     it("should reset all state", () => {
       state.buttons.hold([Button.A, Button.B]);
       state.hat.hold(Hat.Top);
