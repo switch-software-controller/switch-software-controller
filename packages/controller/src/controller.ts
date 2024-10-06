@@ -90,17 +90,17 @@ export interface Controller {
    * example:
    *
    * ```ts
-   * const withReset = true;
+   * const withReset = false;
    * await controller.sendSeries([
    *   [state => state.buttons.hold([Button.A]), 100], // hold [A] for 100ms
    *   [state => state.buttons.hold([Button.B]), 100], // hold [A, B] for 100ms
    *   [state => state.buttons.hold([Button.X]), 100], // hold [A, B, X] for 100ms
    *   [state => state.buttons.hold([Button.Y]), 100], // hold [A, B, X, Y] for 100ms
-   * ], withReset); // reset the state after sending the series
+   * ], withReset); // reset the state after sending each state changes
    * ```
    *
    * @param changes The serial state changes to send. Each item is a tuple of a state changer and a duration.
-   * @param withReset `true` to reset the state after sending the series; otherwise, `false`.
+   * @param withReset `true` to reset the state after sending each state changes; otherwise, `false`.
    */
   sendSeries(
     changes: [StateChanger, number][],
@@ -223,14 +223,14 @@ export class ControllerImpl implements Controller {
 
   async sendSeries(
     changes: [StateChanger, number][],
-    withReset = false,
+    withReset = true,
   ): Promise<void> {
     for (const [stateChanger, duration] of changes) {
       this.sendHold(stateChanger);
       await this.wait(duration);
-    }
-    if (withReset) {
-      this.sendReset();
+      if (withReset) {
+        this.sendReset();
+      }
     }
   }
 }

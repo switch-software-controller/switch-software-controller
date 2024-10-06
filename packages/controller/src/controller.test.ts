@@ -222,16 +222,23 @@ describe(ControllerImpl, () => {
         [(state: ControllerState) => state.buttons.hold([Button.A]), 1000],
         [(state: ControllerState) => state.buttons.hold([Button.B]), 2000],
       ];
+      const withReset = true;
 
       const expectedState = new ControllerState();
       changes[0][0](expectedState);
       const callArgs = [expectedState.serialize()];
+      expectedState.resetAll();
+      callArgs.push(expectedState.serialize());
       changes[1][0](expectedState);
       callArgs.push(expectedState.serialize());
+      expectedState.resetAll();
+      callArgs.push(expectedState.serialize());
 
-      await controller.sendSeries(changes);
+      await controller.sendSeries(changes, withReset);
       expect(spy.mock.calls[0]).toEqual([callArgs[0]]);
       expect(spy.mock.calls[1]).toEqual([callArgs[1]]);
+      expect(spy.mock.calls[2]).toEqual([callArgs[2]]);
+      expect(spy.mock.calls[3]).toEqual([callArgs[3]]);
       expect(wait).nthCalledWith(1, changes[0][1]);
       expect(wait).nthCalledWith(2, changes[1][1]);
     });
@@ -242,20 +249,17 @@ describe(ControllerImpl, () => {
         [(state: ControllerState) => state.buttons.hold([Button.A]), 1000],
         [(state: ControllerState) => state.buttons.hold([Button.B]), 2000],
       ];
-      const withReset = true;
+      const withReset = false;
 
       const expectedState = new ControllerState();
       changes[0][0](expectedState);
       const callArgs = [expectedState.serialize()];
       changes[1][0](expectedState);
       callArgs.push(expectedState.serialize());
-      expectedState.resetAll();
-      callArgs.push(expectedState.serialize());
 
       await controller.sendSeries(changes, withReset);
       expect(spy.mock.calls[0]).toEqual([callArgs[0]]);
       expect(spy.mock.calls[1]).toEqual([callArgs[1]]);
-      expect(spy.mock.calls[2]).toEqual([callArgs[2]]);
       expect(wait).nthCalledWith(1, changes[0][1]);
       expect(wait).nthCalledWith(2, changes[1][1]);
     });
