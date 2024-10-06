@@ -577,7 +577,7 @@ export abstract class BaseCommand {
    */
   @checkCancelled()
   async gotoHomeScreen(): Promise<void> {
-    await this.pressHome();
+    await this.pressHome(100);
     await this.wait(1000);
   }
 
@@ -604,54 +604,54 @@ export abstract class BaseCommand {
     await this.gotoHomeScreen();
 
     // Go to the System Settings
-    await this.tiltLStickBottom();
+    await this.tiltLStickBottom(100);
     for (let i = 0; i < 5; i++) {
-      await this.tiltLStickRight();
+      await this.tiltLStickRight(100);
       await this.wait(100);
     }
-    await this.pressA();
+    await this.pressA(100);
     await this.wait(1500);
     this.checkCancelled();
 
     // Go to System
     for (let i = 0; i < 2; i++) {
-      await this.tiltLStickBottom();
+      await this.tiltLStickBottom(100);
       await this.wait(100);
     }
     await this.wait(300);
-    await this.pressA();
+    await this.pressA(100);
     await this.wait(200);
     this.checkCancelled();
 
     // Go to Date and Time
     await this.tiltLStickBottom(700);
     await this.wait(200);
-    await this.pressA();
+    await this.pressA(100);
     await this.wait(200);
     this.checkCancelled();
 
     // Reset the date and time
     if (withReset) {
-      await this.pressA();
+      await this.pressA(100);
       await this.wait(200);
-      await this.pressA();
+      await this.pressA(100);
       await this.wait(200);
     }
     this.checkCancelled();
 
     // Toggle Auto Time Sync Setting
     if (toggleAuto) {
-      await this.pressA();
+      await this.pressA(100);
       await this.wait(200);
     }
     this.checkCancelled();
 
     // Go to Current Date and Time
     for (let i = 0; i < 2; i++) {
-      await this.tiltLStickBottom();
+      await this.tiltLStickBottom(100);
       await this.wait(100);
     }
-    await this.pressA();
+    await this.pressA(100);
     await this.wait(200);
     this.checkCancelled();
 
@@ -659,18 +659,18 @@ export abstract class BaseCommand {
     const shiftTime = async (diff: number) => {
       const tiltStick = diff < 0 ? this.tiltLStickBottom : this.tiltLStickTop;
       for (let i = 0; i < Math.abs(diff); i++) {
-        await tiltStick();
+        await tiltStick(100);
         await this.wait(100);
         this.checkCancelled();
       }
-      await this.tiltLStickRight();
+      await this.tiltLStickRight(100);
       await this.wait(100);
     };
     for (const d of [years, months, days, hours, minutes]) {
       await shiftTime(d);
       this.checkCancelled();
     }
-    await this.pressA();
+    await this.pressA(100);
   }
 
   /**
