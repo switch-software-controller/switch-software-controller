@@ -18,7 +18,11 @@ export default defineConfig({
     },
     plugins: [
       react(),
-      renderer(),
+      renderer({
+        resolve: {
+          "serialport": { type: 'cjs' },
+        },
+      }),
     ],
   },
 });
