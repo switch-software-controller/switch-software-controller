@@ -1,7 +1,10 @@
 import { fileURLToPath } from "node:url";
 import { electronApp, is, optimizer } from "@electron-toolkit/utils";
-import { BrowserWindow, app, ipcMain, shell } from "electron";
+import remote from "@electron/remote/main/index.js";
+import { BrowserWindow, app, shell } from "electron";
 import icon from "../../resources/icon.png?asset";
+
+remote.initialize();
 
 function createWindow(): void {
   // Create the browser window.
@@ -18,6 +21,7 @@ function createWindow(): void {
       contextIsolation: false,
     },
   });
+  remote.enable(mainWindow.webContents);
 
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
@@ -52,9 +56,6 @@ app.whenReady().then(() => {
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
-
-  // IPC test
-  ipcMain.on("ping", () => console.log("pong"));
 
   createWindow();
 
