@@ -3,7 +3,6 @@ import { Button } from "./button.ts";
 import {
   ControllerImpl,
   type SerializedStateSender,
-  type StateChanger,
   StatelessControllerImpl,
 } from "./controller.ts";
 import { ControllerState } from "./state.ts";
@@ -212,56 +211,6 @@ describe(ControllerImpl, () => {
       expect(wait).nthCalledWith(3, options.duration);
       expect(wait).nthCalledWith(4, options.interval);
       expect(wait).nthCalledWith(5, options.duration);
-    });
-  });
-
-  describe("sendSeries", () => {
-    it("should send the state series", async () => {
-      const spy = vi.spyOn(sender, "send");
-      const changes: [StateChanger, number][] = [
-        [(state: ControllerState) => state.buttons.hold([Button.A]), 1000],
-        [(state: ControllerState) => state.buttons.hold([Button.B]), 2000],
-      ];
-      const withReset = true;
-
-      const expectedState = new ControllerState();
-      changes[0][0](expectedState);
-      const callArgs = [expectedState.serialize()];
-      expectedState.resetAll();
-      callArgs.push(expectedState.serialize());
-      changes[1][0](expectedState);
-      callArgs.push(expectedState.serialize());
-      expectedState.resetAll();
-      callArgs.push(expectedState.serialize());
-
-      await controller.sendSeries(changes, withReset);
-      expect(spy.mock.calls[0]).toEqual([callArgs[0]]);
-      expect(spy.mock.calls[1]).toEqual([callArgs[1]]);
-      expect(spy.mock.calls[2]).toEqual([callArgs[2]]);
-      expect(spy.mock.calls[3]).toEqual([callArgs[3]]);
-      expect(wait).nthCalledWith(1, changes[0][1]);
-      expect(wait).nthCalledWith(2, changes[1][1]);
-    });
-
-    it("should send the state series with reset", async () => {
-      const spy = vi.spyOn(sender, "send");
-      const changes: [StateChanger, number][] = [
-        [(state: ControllerState) => state.buttons.hold([Button.A]), 1000],
-        [(state: ControllerState) => state.buttons.hold([Button.B]), 2000],
-      ];
-      const withReset = false;
-
-      const expectedState = new ControllerState();
-      changes[0][0](expectedState);
-      const callArgs = [expectedState.serialize()];
-      changes[1][0](expectedState);
-      callArgs.push(expectedState.serialize());
-
-      await controller.sendSeries(changes, withReset);
-      expect(spy.mock.calls[0]).toEqual([callArgs[0]]);
-      expect(spy.mock.calls[1]).toEqual([callArgs[1]]);
-      expect(wait).nthCalledWith(1, changes[0][1]);
-      expect(wait).nthCalledWith(2, changes[1][1]);
     });
   });
 });

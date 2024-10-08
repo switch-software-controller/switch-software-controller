@@ -83,29 +83,6 @@ export interface Controller {
     stateChanger: StateChanger,
     options?: SendRepeatOptions,
   ): Promise<void>;
-
-  /**
-   * Sends the serial state changes to the device.
-   *
-   * example:
-   *
-   * ```ts
-   * const withReset = false;
-   * await controller.sendSeries([
-   *   [state => state.buttons.hold([Button.A]), 100], // hold [A] for 100ms
-   *   [state => state.buttons.hold([Button.B]), 100], // hold [A, B] for 100ms
-   *   [state => state.buttons.hold([Button.X]), 100], // hold [A, B, X] for 100ms
-   *   [state => state.buttons.hold([Button.Y]), 100], // hold [A, B, X, Y] for 100ms
-   * ], withReset); // reset the state after sending each state changes
-   * ```
-   *
-   * @param changes The serial state changes to send. Each item is a tuple of a state changer and a duration.
-   * @param withReset `true` to reset the state after sending each state changes; otherwise, `false`.
-   */
-  sendSeries(
-    changes: [StateChanger, number][],
-    withReset?: boolean,
-  ): Promise<void>;
 }
 
 /**
@@ -218,19 +195,6 @@ export class ControllerImpl implements Controller {
         break;
       }
       await this.wait(interval);
-    }
-  }
-
-  async sendSeries(
-    changes: [StateChanger, number][],
-    withReset = true,
-  ): Promise<void> {
-    for (const [stateChanger, duration] of changes) {
-      this.sendHold(stateChanger);
-      await this.wait(duration);
-      if (withReset) {
-        this.sendReset();
-      }
     }
   }
 }
