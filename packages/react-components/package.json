@@ -9,9 +9,9 @@
     "build": "tsc && vite build",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "format": "biome format --write ./src",
-    "lint": "biome lint --write ./src",
-    "check": "biome check --write ./src"
+    "format": "biome format --write --unsafe ./src",
+    "lint": "biome lint --write --unsafe ./src",
+    "check": "biome check --write --unsafe ./src"
   },
   "devDependencies": {
     "@switch-software-controller/tailwind-config": "*"

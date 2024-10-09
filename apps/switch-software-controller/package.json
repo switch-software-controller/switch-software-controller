@@ -9,9 +9,9 @@
   "homepage": "https://github.com/switch-software-controller/switch-software-controller",
   "type": "module",
   "scripts": {
-    "format": "biome format --write ./src",
-    "lint": "biome lint --write ./src",
-    "check": "biome check --write ./src",
+    "format": "biome format --write --unsafe ./src",
+    "lint": "biome lint --write --unsafe ./src",
+    "check": "biome check --write --unsafe ./src",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
