@@ -12,5 +12,8 @@
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
+  },
+  "devDependencies": {
+    "@switch-software-controller/tailwind-config": "*"
   }
 }

@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@electron-toolkit/tsconfig": "1.0.1",
+    "@switch-software-controller/tailwind-config": "*",
     "electron": "32.1.2",
     "electron-builder": "25.1.7",
     "electron-vite": "2.3.0",
