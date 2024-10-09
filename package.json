@@ -10,6 +10,7 @@
     "build": "lerna run build",
     "test": "lerna run test",
     "start": "lerna run start",
+    "storybook:rc": "nx storybook @switch-software-controller/react-components",
     "storybook:ssc": "nx storybook @switch-software-controller/switch-software-controller"
   },
   "devDependencies": {

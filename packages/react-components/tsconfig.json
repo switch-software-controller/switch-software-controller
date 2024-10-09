@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "extends": ["../../tsconfig.json"],
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "baseUrl": "."
+  },
+  "references": [
+    {
+      "path": "./tsconfig.storybook.json"
+    }
+  ],
+  "exclude": [
+    "**/*.stories.ts",
+    "**/*.stories.js",
+    "**/*.stories.jsx",
+    "**/*.stories.tsx"
+  ]
+}
