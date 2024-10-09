@@ -7,11 +7,27 @@
     },
     "build": {
       "cache": true,
-      "dependsOn": ["check" ,"^build"]
+      "dependsOn": [
+        "check",
+        "^build"
+      ]
     },
     "test": {
       "cache": true,
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build"
+      ]
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/storybook/plugin",
+      "options": {
+        "serveStorybookTargetName": "storybook",
+        "buildStorybookTargetName": "build-storybook",
+        "testStorybookTargetName": "test-storybook",
+        "staticStorybookTargetName": "static-storybook"
+      }
+    }
+  ]
 }

@@ -9,10 +9,33 @@
     "check": "lerna run check",
     "build": "lerna run build",
     "test": "lerna run test",
-    "start": "lerna run start"
+    "start": "lerna run start",
+    "storybook:ssc": "nx storybook @switch-software-controller/switch-software-controller"
   },
-  "dependencies": {},
   "devDependencies": {
-    "lerna": "^8.1.8"
+    "@nx/js": "19.8.4",
+    "@nx/storybook": "19.8.4",
+    "@nx/vite": "19.8.4",
+    "@nx/web": "19.8.4",
+    "@storybook/addon-essentials": "8.3.5",
+    "@storybook/addon-interactions": "8.3.5",
+    "@storybook/core-server": "8.3.5",
+    "@storybook/jest": "0.2.3",
+    "@storybook/react-vite": "8.3.5",
+    "@storybook/test-runner": "0.19.1",
+    "@storybook/testing-library": "0.2.2",
+    "@swc-node/register": "1.10.9",
+    "@swc/core": "1.7.26",
+    "@swc/helpers": "0.5.13",
+    "lerna": "8.1.8",
+    "storybook": "8.3.5",
+    "ts-node": "10.9.1",
+    "tslib": "2.7.0",
+    "typescript": "5.6.2",
+    "vite": "5.4.8"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }
