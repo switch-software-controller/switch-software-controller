@@ -18,12 +18,5 @@
     "@switch-software-controller/logger": "*",
     "@switch-software-controller/path-utils": "*",
     "@switch-software-controller/timer": "*"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.3",
-    "typescript": "5.6.2",
-    "vite": "5.4.8",
-    "vite-plugin-dts": "4.2.3",
-    "vitest": "2.1.2"
   }
 }

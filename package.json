@@ -13,6 +13,7 @@
     "storybook:ssc": "nx storybook @switch-software-controller/switch-software-controller"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.3",
     "@nx/js": "19.8.4",
     "@nx/storybook": "19.8.4",
     "@nx/vite": "19.8.4",
@@ -27,12 +28,22 @@
     "@swc-node/register": "1.10.9",
     "@swc/core": "1.7.26",
     "@swc/helpers": "0.5.13",
+    "@types/node": "22.7.5",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.2",
+    "@vitest/coverage-v8": "2.1.2",
+    "autoprefixer": "10.4.20",
     "lerna": "8.1.8",
+    "postcss": "8.4.47",
     "storybook": "8.3.5",
+    "tailwindcss": "3.4.13",
     "ts-node": "10.9.1",
     "tslib": "2.7.0",
     "typescript": "5.6.2",
-    "vite": "5.4.8"
+    "vite": "5.4.8",
+    "vite-plugin-dts": "4.2.3",
+    "vitest": "2.1.2"
   },
   "dependencies": {
     "react": "18.3.1",
