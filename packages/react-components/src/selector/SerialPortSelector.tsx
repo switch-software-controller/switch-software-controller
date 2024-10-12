@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from "react";
-import type { SerialPort } from "./SerialPortOption.tsx";
-import { SerialPortList } from "./SerialPortList.tsx";
 import { useOnClickOutside } from "../hooks/use-on-click-outside.ts";
+import { SerialPortList } from "./SerialPortList.tsx";
+import type { SerialPort } from "./SerialPortOption.tsx";
 
 export type SerialPortSelectorProps = {
   ports: SerialPort[];

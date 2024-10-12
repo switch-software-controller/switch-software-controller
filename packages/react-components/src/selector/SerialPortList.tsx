@@ -6,9 +6,15 @@ export type SerialPortListProps = {
   onClick: (id: string) => void;
 };
 
-export const SerialPortList = forwardRef(function SerialPortList({ ports, onClick }: SerialPortListProps, ref: ForwardedRef<HTMLUListElement>) {
+export const SerialPortList = forwardRef(function SerialPortList(
+  { ports, onClick }: SerialPortListProps,
+  ref: ForwardedRef<HTMLUListElement>,
+) {
   return (
-    <ul ref={ref} className="flex max-w-48 flex-col gap-1 rounded-md border border-on-primary-container bg-primary-container p-2">
+    <ul
+      ref={ref}
+      className="flex max-w-48 flex-col gap-1 rounded-md border border-on-primary-container bg-primary-container p-2"
+    >
       {ports.map((port, index) => (
         <>
           <li key={port.id} className="flex flex-col gap-1">
