@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { SerialPortSelector } from "./SerialPortSelector.tsx";
+import { SerialPortList } from "./SerialPortList.tsx";
 
-const meta: Meta<typeof SerialPortSelector> = {
-  component: SerialPortSelector,
+const meta: Meta<typeof SerialPortList> = {
+  component: SerialPortList,
 };
 export default meta;
 
-type Story = StoryObj<typeof SerialPortSelector>;
+type Story = StoryObj<typeof SerialPortList>;
 
 export const Basic: Story = {
   args: {

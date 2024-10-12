@@ -1,24 +1,36 @@
-import React from "react";
-import { type SerialPort, SerialPortOption } from "./SerialPortOption.tsx";
+import React, { useCallback, useRef } from "react";
+import type { SerialPort } from "./SerialPortOption.tsx";
+import { SerialPortList } from "./SerialPortList.tsx";
+import { useOnClickOutside } from "../hooks/use-on-click-outside.ts";
 
-export type SerialPortSelectProps = {
+export type SerialPortSelectorProps = {
   ports: SerialPort[];
   onClick: (id: string) => void;
 };
 
-export function SerialPortSelect({ ports, onClick }: SerialPortSelectProps) {
+export function SerialPortSelector({
+  ports,
+  onClick,
+}: SerialPortSelectorProps) {
+  const [visible, setVisible] = React.useState(false);
+  const [currentPort, setCurrentPort] = React.useState<SerialPort | null>(
+    ports?.[0] ?? null,
+  );
+  const ref = useRef<HTMLUListElement>(null);
+  useOnClickOutside(ref, () => setVisible(false));
+  const onSelect = useCallback(
+    (id: string) => {
+      onClick(id);
+      setCurrentPort(ports.find((port) => port.id === id) ?? null);
+      setVisible(false);
+    },
+    [onClick, ports.find],
+  );
+
   return (
-    <div className="flex max-w-48 flex-col gap-1 rounded-md bg-primary-container p-2">
-      {ports.map((port, index) => (
-        <>
-          <div key={port.id}>
-            <SerialPortOption port={port} onClick={onClick} />
-          </div>
-          {index < ports.length - 1 && (
-            <hr className="max-h-max border-on-primary-container" />
-          )}
-        </>
-      ))}
+    <div className="flex flex-col">
+      <button onClick={() => setVisible(!visible)}>{currentPort?.name}</button>
+      {visible && <SerialPortList ref={ref} ports={ports} onClick={onSelect} />}
     </div>
   );
 }

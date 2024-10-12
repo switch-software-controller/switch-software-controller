@@ -14,7 +14,7 @@ export type SerialPortOptionProps = {
 export function SerialPortOption({ port, onClick }: SerialPortOptionProps) {
   return (
     <div
-      className="flex max-w-48 flex-col rounded-md bg-primary-container p-4 hover:brightness-150"
+      className="flex max-w-48 flex-col rounded-md bg-primary-container p-4 transition-colors duration-hover ease-in hover:bg-primary-container-hover"
       onClick={() => onClick(port.id)}
     >
       <div className="font-bold text-lg text-on-primary-container">
