@@ -138,6 +138,34 @@ class StickState {
   }
 
   /**
+   * Changes the x-coordinate of the stick state.
+   * And sets the stick state to dirty if the stick state is changed.
+   *
+   * @param newValue
+   */
+  set x(newValue: number) {
+    const clamped = this.clamp(newValue);
+    if (this._x !== clamped) {
+      this._x = clamped;
+      this._isDirty = true;
+    }
+  }
+
+  /**
+   * Changes the y-coordinate of the stick state.
+   * And sets the stick state to dirty if the stick state is changed.
+   *
+   * @param newValue
+   */
+  set y(newValue: number) {
+    const clamped = this.clamp(newValue);
+    if (this._y !== clamped) {
+      this._y = clamped;
+      this._isDirty = true;
+    }
+  }
+
+  /**
    * Changes the tilt of the stick state.
    *
    * @param newTilt
@@ -172,31 +200,12 @@ class StickState {
   }
 
   /**
-   * Changes the x-coordinate of the stick state.
-   * And sets the stick state to dirty if the stick state is changed.
-   *
-   * @param newValue
+   * Clamps the specified value to the range [0, 255].
+   * @param value
    * @private
    */
-  private set x(newValue: number) {
-    if (this._x !== newValue) {
-      this._x = newValue;
-      this._isDirty = true;
-    }
-  }
-
-  /**
-   * Changes the y-coordinate of the stick state.
-   * And sets the stick state to dirty if the stick state is changed.
-   *
-   * @param newValue
-   * @private
-   */
-  private set y(newValue: number) {
-    if (this._y !== newValue) {
-      this._y = newValue;
-      this._isDirty = true;
-    }
+  private clamp(value: number): number {
+    return Math.max(0, Math.min(255, value));
   }
 }
 
