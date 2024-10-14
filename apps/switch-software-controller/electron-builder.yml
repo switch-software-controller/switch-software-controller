@@ -1,5 +1,7 @@
 appId: com.example.switch-software-controller
 productName: Switch Software Controller
+extraMetadata:
+  name: Switch Software Controller
 directories:
   buildResources: build
 files:
