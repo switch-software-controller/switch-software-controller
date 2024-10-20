@@ -1,39 +1,13 @@
 import type React from "react";
-import { useState } from "react";
 import { BsController } from "react-icons/bs";
-import { CiFolderOn, CiVideoOn } from "react-icons/ci";
+import { CiVideoOn } from "react-icons/ci";
 import { FaUsb } from "react-icons/fa";
 
 function App(): React.JSX.Element {
   const videoElementId = "camera";
-  const [toolPaneSelected, setToolPaneSelected] = useState<string>("none");
-
-  const selectToolPane = (toolPane: string) => {
-    if (toolPane === toolPaneSelected) {
-      setToolPaneSelected("none");
-    } else {
-      setToolPaneSelected(toolPane);
-    }
-  };
-
   return (
     <div className="h-dvh bg-surface">
       <div className="flex h-dvh">
-        <aside className="flex h-full w-10 flex-col border-on-surface bg-surface-bright">
-          <button
-            className="p-1 text-3xl text-on-surface hover:bg-surface-dim"
-            onClick={() => selectToolPane("explorer")}
-          >
-            <CiFolderOn />
-          </button>
-        </aside>
-        {toolPaneSelected !== "none" && (
-          <div className="flex w-64 border border-on-surface bg-surface-bright text-on-surface">
-            {toolPaneSelected === "explorer" && (
-              <div className="p-2">Explorer</div>
-            )}
-          </div>
-        )}
         <div className="flex flex-1 flex-col text-on-surface">
           <video id={videoElementId} autoPlay className="w-full p-2" />
           <div className="flex h-full w-full">
