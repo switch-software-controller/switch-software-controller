@@ -1,40 +1,7 @@
-/**
- * This module defines the StickTiltRange, Angle, Modulus, and StickTilt classes,
- * as well as the StickTiltPreset constants. These are used to represent and manipulate
- * the tilt of a joystick or similar input device.
- */
+import { StickTiltRange, type StickTilt, StickTiltPreset } from '@switch-software-controller/controller-api';
 
-/**
- * Defines the range of possible values for the tilt of a joystick.
- */
-export const StickTiltRange = {
-  /** The minimum tilt value (0). */
-  Min: 0,
-
-  /** The center tilt value (128). */
-  Center: 128,
-
-  /** The maximum tilt value (255). */
-  Max: 255,
-} as const;
-/**
- * Represents the range of possible values for the tilt of a joystick.
- */
-export type StickTiltRange =
-  (typeof StickTiltRange)[keyof typeof StickTiltRange];
-
-/**
- * Represents the tilt of a joystick.
- */
-export class StickTilt {
-  /**
-   * The x-coordinate of the tilt.
-   */
+export class StickTiltImpl implements StickTilt {
   readonly x: number;
-
-  /**
-   * The y-coordinate of the tilt.
-   */
   readonly y: number;
 
   /**
@@ -50,12 +17,12 @@ export class StickTilt {
     angle: number;
     modulus?: number;
   }) {
-    const mod = StickTilt.normalizeModulus(modulus);
+    const mod = this.normalizeModulus(modulus);
     if (mod === 0.0) {
       this.x = StickTiltRange.Center;
       this.y = StickTiltRange.Center;
     } else {
-      const xy = StickTilt.calculateXY(angle, mod);
+      const xy = this.calculateXY(angle, mod);
       this.x = xy.x;
       this.y = xy.y;
     }
@@ -68,7 +35,7 @@ export class StickTilt {
    * @param modulus The value to normalize.
    * @returns The normalized modulus.
    */
-  private static normalizeModulus(modulus: number): number {
+  private normalizeModulus(modulus: number): number {
     return Math.max(0.0, Math.min(modulus, 1.0));
   }
 
@@ -77,12 +44,12 @@ export class StickTilt {
    *
    * @private
    */
-  private static calculateXY(
+  private calculateXY(
     degrees: number,
     modulus: number,
   ): { x: number; y: number } {
     const maxRange = StickTiltRange.Max;
-    const rad = StickTilt.radiansFrom(degrees);
+    const rad = this.radiansFrom(degrees);
     return {
       x: Math.ceil(127.5 * Math.cos(rad) * modulus + 127.5),
       y: maxRange - Math.ceil(127.5 * Math.sin(rad) * modulus + 127.5),
@@ -94,7 +61,7 @@ export class StickTilt {
    * @param degrees
    * @private
    */
-  private static radiansFrom(degrees: number): number {
+  private radiansFrom(degrees: number): number {
     return (degrees * Math.PI) / 180.0;
   }
 }
@@ -102,19 +69,15 @@ export class StickTilt {
 /**
  * Preset StickTilt instances for common joystick tilt values.
  */
-export const StickTiltPreset = {
-  Neutral: new StickTilt({ angle: 0.0, modulus: 0.0 }),
-  Right: new StickTilt({ angle: 0.0 }),
-  TopRight: new StickTilt({ angle: 45.0 }),
-  Top: new StickTilt({ angle: 90.0 }),
-  TopLeft: new StickTilt({ angle: 135.0 }),
-  Left: new StickTilt({ angle: 180.0 }),
-  BottomLeft: new StickTilt({ angle: 225.0 }),
-  Bottom: new StickTilt({ angle: 270.0 }),
-  BottomRight: new StickTilt({ angle: 315.0 }),
+export const StickTiltPresetDefault = {
+  [StickTiltPreset.Neutral]: new StickTiltImpl({ angle: 0.0, modulus: 0.0 }),
+  [StickTiltPreset.Right]: new StickTiltImpl({ angle: 0.0 }),
+  [StickTiltPreset.TopRight]: new StickTiltImpl({ angle: 45.0 }),
+  [StickTiltPreset.Top]: new StickTiltImpl({ angle: 90.0 }),
+  [StickTiltPreset.TopLeft]: new StickTiltImpl({ angle: 135.0 }),
+  [StickTiltPreset.Left]: new StickTiltImpl({ angle: 180.0 }),
+  [StickTiltPreset.BottomLeft]: new StickTiltImpl({ angle: 225.0 }),
+  [StickTiltPreset.Bottom]: new StickTiltImpl({ angle: 270.0 }),
+  [StickTiltPreset.BottomRight]: new StickTiltImpl({ angle: 315.0 }),
 } as const;
-/**
- * Represents a preset StickTilt instance for common joystick tilt values.
- */
-export type StickTiltPreset =
-  (typeof StickTiltPreset)[keyof typeof StickTiltPreset];
+export type StickTiltPresetDefault = (typeof StickTiltPresetDefault)[keyof typeof StickTiltPresetDefault];

@@ -1,11 +1,21 @@
-import { Button } from "./button.ts";
-import { Hat } from "./hat.ts";
-import { type StickTilt, StickTiltRange } from "./stick-tilt.ts";
+import {
+  Button,
+  type ButtonState,
+  type ControllerState,
+  Hat,
+  type HatState,
+  type StateSerializer,
+  type StickState,
+  type StickTilt,
+  type StickTiltPreset,
+  StickTiltRange,
+} from "@switch-software-controller/controller-api";
+import { StickTiltPresetDefault } from "./stick-tilt.ts";
 
 /**
- * Represents the state of a button.
+ * Default Implementation of ButtonState
  */
-class ButtonState {
+class ButtonStateImpl implements ButtonState {
   /**
    * The value of the button state.
    * @private
@@ -18,33 +28,20 @@ class ButtonState {
    * @param buttons The buttons to hold.
    */
   constructor(buttons: Button[] = []) {
-    this.hold(buttons);
+    this.press(buttons);
   }
 
-  /**
-   * The value of the button state.
-   */
   get value() {
     return this._value;
   }
 
-  /**
-   * Changes the state of the specified buttons to hold.
-   *
-   * @param buttons
-   */
-  hold(buttons: Button[]) {
+  press(buttons: Button[]) {
     this._value = buttons.reduce(
       (prev, current) => prev | current,
       this._value,
     );
   }
 
-  /**
-   * Changes the state of the specified buttons to release.
-   *
-   * @param buttons
-   */
   release(buttons: Button[]) {
     this._value = buttons.reduce(
       (prev, current) => prev & ~current,
@@ -52,18 +49,15 @@ class ButtonState {
     );
   }
 
-  /**
-   * Changes the state of all buttons to release.
-   */
-  releaseAll() {
-    this._value = 0;
+  reset() {
+    this._value = Button.Noop;
   }
 }
 
 /**
- * Represents the state of a hat.
+ * Default Implementation of HatState
  */
-class HatState {
+class HatStateImpl implements HatState {
   /**
    * The value of the hat state.
    * @private
@@ -78,33 +72,23 @@ class HatState {
     this._value = hat;
   }
 
-  /**
-   * The value of the hat state.
-   */
   get value() {
     return this._value;
   }
 
-  /**
-   * Changes the state of the hat to hold.
-   * @param hat
-   */
-  hold(hat: Hat) {
+  press(hat: Hat) {
     this._value = hat;
   }
 
-  /**
-   * Changes the state of the hat to release.
-   */
-  release() {
+  reset() {
     this._value = Hat.Neutral;
   }
 }
 
 /**
- * Represents the state of a stick.
+ * Default Implementation of StickState
  */
-class StickState {
+class StickStateImpl implements StickState {
   /**
    * `true` if the stick state is dirty; otherwise, false.
    * @private
@@ -123,26 +107,14 @@ class StickState {
    */
   private _y: number = StickTiltRange.Center;
 
-  /**
-   * The x-coordinate of the stick state.
-   */
   get x() {
     return this._x;
   }
 
-  /**
-   * The y-coordinate of the stick state.
-   */
   get y() {
     return this._y;
   }
 
-  /**
-   * Changes the x-coordinate of the stick state.
-   * And sets the stick state to dirty if the stick state is changed.
-   *
-   * @param newValue
-   */
   set x(newValue: number) {
     const clamped = this.clamp(newValue);
     if (this._x !== clamped) {
@@ -151,12 +123,6 @@ class StickState {
     }
   }
 
-  /**
-   * Changes the y-coordinate of the stick state.
-   * And sets the stick state to dirty if the stick state is changed.
-   *
-   * @param newValue
-   */
   set y(newValue: number) {
     const clamped = this.clamp(newValue);
     if (this._y !== clamped) {
@@ -165,36 +131,24 @@ class StickState {
     }
   }
 
-  /**
-   * Changes the tilt of the stick state.
-   *
-   * @param newTilt
-   */
   set tilt(newTilt: StickTilt) {
     this.x = newTilt.x;
     this.y = newTilt.y;
   }
 
-  /**
-   * `true` if the stick state is dirty; otherwise, false.
-   */
+  set tiltPreset(newTiltPreset: StickTiltPreset) {
+    this.tilt = StickTiltPresetDefault[newTiltPreset];
+  }
+
   get isDirty() {
     return this._isDirty;
   }
 
-  /**
-   * Changes the tilt of the stick state to neutral.(x: ```StickTiltRange.Center```, y: ```StickTiltRange.Center```)
-   * And sets the stick state to dirty if the stick state is changed.
-   */
-  toNeutral() {
+  reset() {
     this.x = StickTiltRange.Center;
     this.y = StickTiltRange.Center;
   }
 
-  /**
-   * Sets the stick state to clean.
-   * Use this method after consuming the stick state.
-   */
   consume() {
     this._isDirty = false;
   }
@@ -209,10 +163,7 @@ class StickState {
   }
 }
 
-/**
- * Represents the state of a controller.
- */
-export class ControllerState {
+export class ControllerStateImpl implements ControllerState {
   /**
    * Creates a new controller state with the specified buttons, hat, left stick, and right stick.
    *
@@ -224,63 +175,37 @@ export class ControllerState {
    */
   constructor(
     private readonly serializer: StateSerializer = new StateSerializerImpl(),
-    readonly buttons = new ButtonState(),
-    readonly hat = new HatState(),
-    readonly lStick = new StickState(),
-    readonly rStick = new StickState(),
+    readonly buttons = new ButtonStateImpl(),
+    readonly hat = new HatStateImpl(),
+    readonly lStick = new StickStateImpl(),
+    readonly rStick = new StickStateImpl(),
   ) {}
 
-  /**
-   * `true` if the controller stick state is dirty; otherwise, false.
-   */
   get isDirty() {
     return this.lStick.isDirty || this.rStick.isDirty;
   }
 
-  /**
-   * Changes the state to release all buttons, hat, and sticks.
-   */
-  resetAll() {
-    this.buttons.releaseAll();
-    this.hat.release();
-    this.lStick.toNeutral();
-    this.rStick.toNeutral();
+  reset() {
+    this.buttons.reset();
+    this.hat.reset();
+    this.lStick.reset();
+    this.rStick.reset();
   }
 
-  /**
-   * Changes the state to clean the stick state.
-   * Use this method after consuming the stick state.
-   */
   consumeSticks() {
     this.lStick.consume();
     this.rStick.consume();
   }
 
-  /**
-   * Serializes the controller state to a string.
-   */
   serialize() {
     return this.serializer.serialize(this);
   }
 }
 
 /**
- * Represents a state serializer.
- * The state serializer serializes the controller state to a string.
- */
-export interface StateSerializer {
-  serialize(state: ControllerState): string;
-}
-
-/**
- * Represents a state serializer that serializes the controller state to a string.
+ * Default Implementation of StateSerializer
  */
 export class StateSerializerImpl implements StateSerializer {
-  /**
-   * Serializes the controller state to a string.
-   *
-   * @param state
-   */
   serialize(state: ControllerState): string {
     const hex = (n: number) => {
       return Number(n).toString(16);

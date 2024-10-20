@@ -1,14 +1,19 @@
 import { beforeEach, describe, expect, it, test } from "vitest";
-import { Button } from "./button.ts";
-import { Hat } from "./hat.ts";
-import { ControllerState, StateSerializerImpl } from "./state.ts";
-import { StickTiltPreset, StickTiltRange } from "./stick-tilt.ts";
+import {
+  Button,
+  type ControllerState,
+  Hat,
+  StickTiltPreset,
+  StickTiltRange
+} from "@switch-software-controller/controller-api"
+import { ControllerStateImpl, StateSerializerImpl } from "./state.ts";
+import { StickTiltPresetDefault } from "./stick-tilt.ts";
 
-describe(ControllerState, () => {
-  let state: ControllerState;
+describe(ControllerStateImpl, () => {
+  let state: ControllerStateImpl;
 
   beforeEach(() => {
-    state = new ControllerState();
+    state = new ControllerStateImpl();
   });
 
   test("initial state", () => {
@@ -23,27 +28,29 @@ describe(ControllerState, () => {
   });
 
   describe("state.buttons", () => {
-    describe("hold", () => {
+    describe("press", () => {
       it("should set the value of the buttons", () => {
-        state.buttons.hold([Button.A, Button.B]);
+        state.buttons.press([Button.A, Button.B]);
         expect(state.buttons.value).toBe(Button.A | Button.B);
       });
 
       it("should idempotent hold Button.Noop", () => {
-        state.buttons.hold([Button.Noop]);
+        state.buttons.press([Button.Noop]);
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
       it("should idempotent hold Button.Noop", () => {
-        state.buttons.hold([Button.A, Button.B]);
-        state.buttons.hold([Button.Noop]);
+        state.buttons.press([Button.A, Button.B]);
+        expect(state.buttons.value).toBe(Button.A | Button.B);
+        state.buttons.press([Button.Noop]);
         expect(state.buttons.value).toBe(Button.A | Button.B);
       });
     });
 
     describe("release", () => {
       it("should set the value of the buttons", () => {
-        state.buttons.hold([Button.A, Button.B]);
+        state.buttons.press([Button.A, Button.B]);
+        expect(state.buttons.value).toBe(Button.A | Button.B);
         state.buttons.release([Button.A]);
         expect(state.buttons.value).toBe(Button.B);
       });
@@ -54,56 +61,66 @@ describe(ControllerState, () => {
       });
 
       it("should idempotent release Button.Noop", () => {
-        state.buttons.hold([Button.A, Button.B]);
+        state.buttons.press([Button.A, Button.B]);
+        expect(state.buttons.value).toBe(Button.A | Button.B);
         state.buttons.release([Button.Noop]);
         expect(state.buttons.value).toBe(Button.A | Button.B);
       });
     });
 
-    describe("releaseAll", () => {
+    describe("reset", () => {
       it("should set the value of the buttons", () => {
-        state.buttons.hold([Button.A, Button.B]);
-        state.buttons.releaseAll();
+        state.buttons.press([Button.A, Button.B]);
+        expect(state.buttons.value).toBe(Button.A | Button.B);
+        state.buttons.reset();
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
-      it("should idempotent releaseAll if initial state", () => {
-        state.buttons.releaseAll();
+      it("should idempotent reset if initial state", () => {
+        expect(state.buttons.value).toBe(Button.Noop);
+        state.buttons.reset();
         expect(state.buttons.value).toBe(Button.Noop);
       });
 
-      it("should idempotent releaseAll if already reset", () => {
-        state.buttons.hold([Button.A, Button.B]);
-        state.buttons.releaseAll();
-        state.buttons.releaseAll();
+      it("should idempotent reset if already reset", () => {
+        state.buttons.press([Button.A, Button.B]);
+        expect(state.buttons.value).toBe(Button.A | Button.B);
+        state.buttons.reset();
+        expect(state.buttons.value).toBe(Button.Noop);
+        state.buttons.reset();
         expect(state.buttons.value).toBe(Button.Noop);
       });
     });
   });
 
   describe("state.hat", () => {
-    describe("hold", () => {
+    describe("press", () => {
       it("should set the value of the hat", () => {
-        state.hat.hold(Hat.Top);
+        expect(state.hat.value).toBe(Hat.Neutral);
+        state.hat.press(Hat.Top);
         expect(state.hat.value).toBe(Hat.Top);
       });
 
       it("should idempotent hold Hat.Top if current value is Hat.Top", () => {
-        state.hat.hold(Hat.Top);
-        state.hat.hold(Hat.Top);
+        state.hat.press(Hat.Top);
+        expect(state.hat.value).toBe(Hat.Top);
+        state.hat.press(Hat.Top);
         expect(state.hat.value).toBe(Hat.Top);
       });
     });
 
-    describe("release", () => {
+    describe("reset", () => {
       it("should set the value to Hat.Neutral", () => {
-        state.hat.hold(Hat.Top);
-        state.hat.release();
+        expect(state.hat.value).toBe(Hat.Neutral);
+        state.hat.press(Hat.Top);
+        expect(state.hat.value).toBe(Hat.Top);
+        state.hat.reset();
         expect(state.hat.value).toBe(Hat.Neutral);
       });
 
       it("should idempotent release Hat.Neutral if current value is Hat.Neutral", () => {
-        state.hat.release();
+        expect(state.hat.value).toBe(Hat.Neutral);
+        state.hat.reset();
         expect(state.hat.value).toBe(Hat.Neutral);
       });
     });
@@ -113,7 +130,7 @@ describe(ControllerState, () => {
     describe("tilt", () => {
       it("should not dirty if not tilt changed", () => {
         for (const stick of [state.lStick, state.rStick]) {
-          stick.tilt = StickTiltPreset.Neutral;
+          stick.tilt = StickTiltPresetDefault[StickTiltPreset.Neutral];
           expect(stick.x).toBe(StickTiltRange.Center);
           expect(stick.y).toBe(StickTiltRange.Center);
           expect(stick.isDirty).toBe(false);
@@ -122,9 +139,29 @@ describe(ControllerState, () => {
 
       it("should dirty if tilt changed", () => {
         for (const stick of [state.lStick, state.rStick]) {
-          stick.tilt = StickTiltPreset.Top;
-          expect(stick.x).toBe(StickTiltPreset.Top.x);
-          expect(stick.y).toBe(StickTiltPreset.Top.y);
+          stick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
+          expect(stick.x).toBe(StickTiltPresetDefault[StickTiltPreset.Top].x);
+          expect(stick.y).toBe(StickTiltPresetDefault[StickTiltPreset.Top].y);
+          expect(stick.isDirty).toBe(true);
+        }
+      });
+    });
+
+    describe("tiltPreset", () => {
+      it("should not dirty if not tilt changed", () => {
+        for (const stick of [state.lStick, state.rStick]) {
+          stick.tiltPreset = StickTiltPreset.Neutral;
+          expect(stick.x).toBe(StickTiltRange.Center);
+          expect(stick.y).toBe(StickTiltRange.Center);
+          expect(stick.isDirty).toBe(false);
+        }
+      });
+
+      it("should dirty if tilt changed", () => {
+        for (const stick of [state.lStick, state.rStick]) {
+          stick.tiltPreset = StickTiltPreset.Top;
+          expect(stick.x).toBe(StickTiltPresetDefault[StickTiltPreset.Top].x);
+          expect(stick.y).toBe(StickTiltPresetDefault[StickTiltPreset.Top].y);
           expect(stick.isDirty).toBe(true);
         }
       });
@@ -133,14 +170,14 @@ describe(ControllerState, () => {
     describe("consume", () => {
       it("should not dirty if not consume", () => {
         for (const stick of [state.lStick, state.rStick]) {
-          stick.tilt = StickTiltPreset.Top;
+          stick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
           expect(stick.isDirty).toBe(true);
         }
       });
 
       it("should not dirty if consume", () => {
         for (const stick of [state.lStick, state.rStick]) {
-          stick.tilt = StickTiltPreset.Top;
+          stick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
           expect(stick.isDirty).toBe(true);
           stick.consume();
           expect(stick.isDirty).toBe(false);
@@ -148,10 +185,10 @@ describe(ControllerState, () => {
       });
     });
 
-    describe("toNeutral", () => {
+    describe("reset", () => {
       it("should not dirty if tilt is already neutral", () => {
         for (const stick of [state.lStick, state.rStick]) {
-          stick.toNeutral();
+          stick.reset();
           expect(stick.x).toBe(StickTiltRange.Center);
           expect(stick.y).toBe(StickTiltRange.Center);
           expect(stick.isDirty).toBe(false);
@@ -160,11 +197,11 @@ describe(ControllerState, () => {
 
       it("should dirty if tilt is not neutral", () => {
         for (const stick of [state.lStick, state.rStick]) {
-          stick.tilt = StickTiltPreset.Top;
+          stick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
           expect(stick.isDirty).toBe(true);
           stick.consume();
           expect(stick.isDirty).toBe(false);
-          stick.toNeutral();
+          stick.reset();
           expect(stick.x).toBe(StickTiltRange.Center);
           expect(stick.y).toBe(StickTiltRange.Center);
           expect(stick.isDirty).toBe(true);
@@ -175,24 +212,24 @@ describe(ControllerState, () => {
 
   describe("isDirty", () => {
     it("should be true if any state is dirty", () => {
-      state.lStick.tilt = StickTiltPreset.Top;
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
       expect(state.isDirty).toBe(true);
     });
 
     it("should be false if all state is not dirty", () => {
-      state.lStick.tilt = StickTiltPreset.Top;
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
       state.lStick.consume();
       expect(state.isDirty).toBe(false);
     });
   });
 
-  describe("resetAll", () => {
+  describe("reset", () => {
     it("should reset all state", () => {
-      state.buttons.hold([Button.A, Button.B]);
-      state.hat.hold(Hat.Top);
-      state.lStick.tilt = StickTiltPreset.Top;
-      state.rStick.tilt = StickTiltPreset.Top;
-      state.resetAll();
+      state.buttons.press([Button.A, Button.B]);
+      state.hat.press(Hat.Top);
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
+      state.reset();
 
       expect(state.isDirty).toBe(true);
       expect(state.buttons.value).toBe(Button.Noop);
@@ -207,8 +244,8 @@ describe(ControllerState, () => {
 
   describe("consumeSticks", () => {
     it("should consume sticks", () => {
-      state.lStick.tilt = StickTiltPreset.Top;
-      state.rStick.tilt = StickTiltPreset.Top;
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
       state.consumeSticks();
       expect(state.lStick.isDirty).toBe(false);
       expect(state.rStick.isDirty).toBe(false);
@@ -217,18 +254,18 @@ describe(ControllerState, () => {
 
   describe("serialize", () => {
     it("should serialize the state", () => {
-      state.buttons.hold([Button.A, Button.B]);
-      state.hat.hold(Hat.Top);
-      state.lStick.tilt = StickTiltPreset.Top;
-      state.rStick.tilt = StickTiltPreset.Top;
+      state.buttons.press([Button.A, Button.B]);
+      state.hat.press(Hat.Top);
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
       expect(state.serialize()).toBe("0x001b 0 80 0 80 0");
     });
 
     it("should serialize the state", () => {
-      state.buttons.hold([Button.A, Button.B, Button.Noop]);
-      state.hat.hold(Hat.Top);
-      state.lStick.tilt = StickTiltPreset.Top;
-      state.rStick.tilt = StickTiltPreset.Top;
+      state.buttons.press([Button.A, Button.B, Button.Noop]);
+      state.hat.press(Hat.Top);
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
       expect(state.serialize()).toBe("0x001b 0 80 0 80 0");
     });
   });
@@ -240,7 +277,7 @@ describe(StateSerializerImpl, () => {
 
   beforeEach(() => {
     serializer = new StateSerializerImpl();
-    state = new ControllerState();
+    state = new ControllerStateImpl();
   });
 
   describe("serialize", () => {
@@ -249,36 +286,36 @@ describe(StateSerializerImpl, () => {
     });
 
     it("should serialize the state", () => {
-      state.buttons.hold([Button.X, Button.LStick]);
+      state.buttons.press([Button.X, Button.LStick]);
       expect(serializer.serialize(state)).toBe("0x1020 8  ");
     });
 
     it("should serialize the state", () => {
-      state.buttons.hold([Button.X, Button.LStick]);
-      state.hat.hold(Hat.BottomLeft);
-      state.lStick.tilt = StickTiltPreset.Right;
-      state.rStick.tilt = StickTiltPreset.Left;
+      state.buttons.press([Button.X, Button.LStick]);
+      state.hat.press(Hat.BottomLeft);
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Right];
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Left];
       expect(serializer.serialize(state)).toBe("0x1023 5 ff 7f 0 7f");
     });
 
     it("should serialize the state", () => {
-      state.buttons.hold([Button.X, Button.LStick]);
-      state.hat.hold(Hat.BottomLeft);
-      state.lStick.tilt = StickTiltPreset.Right;
+      state.buttons.press([Button.X, Button.LStick]);
+      state.hat.press(Hat.BottomLeft);
+      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Right];
       expect(serializer.serialize(state)).toBe("0x1022 5 ff 7f ");
     });
 
     it("should serialize the state", () => {
-      state.buttons.hold([Button.X, Button.LStick]);
-      state.hat.hold(Hat.BottomLeft);
-      state.rStick.tilt = StickTiltPreset.Left;
+      state.buttons.press([Button.X, Button.LStick]);
+      state.hat.press(Hat.BottomLeft);
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Left];
       expect(serializer.serialize(state)).toBe("0x1021 5  0 7f");
     });
 
     it("should serialize the state", () => {
-      state.buttons.hold([Button.X, Button.LStick]);
-      state.hat.hold(Hat.BottomLeft);
-      state.rStick.tilt = StickTiltPreset.Left;
+      state.buttons.press([Button.X, Button.LStick]);
+      state.hat.press(Hat.BottomLeft);
+      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Left];
       state.consumeSticks();
       expect(serializer.serialize(state)).toBe("0x1020 5  ");
     });
