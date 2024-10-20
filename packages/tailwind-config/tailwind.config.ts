@@ -22,8 +22,10 @@ const config: Omit<Config, "content" | "presets"> = {
         "on-error": "#ffffff",
         "error-container": "#ff0000",
         "on-error-container": "#ffffff",
-        surface: "#ffffff",
-        "on-surface": "#000000",
+        surface: "#0f0f0f",
+        "surface-bright": "#272727",
+        "surface-dim": "#000000",
+        "on-surface": "#ffffff",
       },
       transitionDuration: {
         hover: "300ms",
