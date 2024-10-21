@@ -45,4 +45,3 @@ export interface StickState {
    */
   consume(): void;
 }
-

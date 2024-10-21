@@ -1,5 +1,8 @@
-import { Button, type ButtonState } from '@switch-software-controller/controller-api';
-import { ButtonValue } from '../primitives';
+import {
+  Button,
+  type ButtonState,
+} from "@switch-software-controller/controller-api";
+import { ButtonValue } from "../primitives";
 
 /**
  * Default Implementation of ButtonState
@@ -42,4 +45,3 @@ export class ButtonStateImpl implements ButtonState {
     this._value = ButtonValue[Button.Noop];
   }
 }
-

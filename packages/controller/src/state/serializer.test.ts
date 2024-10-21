@@ -1,7 +1,16 @@
+import {
+  Button,
+  type ControllerState,
+  Hat,
+  StickTiltPreset,
+} from "@switch-software-controller/controller-api";
 import { beforeEach, describe, expect, it } from "vitest";
-import { Button, type ControllerState, Hat, StickTiltPreset, } from "@switch-software-controller/controller-api";
-import { ButtonStateImpl, ControllerStateImpl, HatStateImpl, StateSerializerImpl, StickStateImpl, } from "./index.ts";
 import { StickTiltPresetDefault } from "../primitives";
+import { ButtonStateImpl } from "./button.ts";
+import { ControllerStateImpl } from "./controller.ts";
+import { HatStateImpl } from "./hat.ts";
+import { StateSerializerImpl } from "./serializer.ts";
+import { StickStateImpl } from "./stick.ts";
 
 describe(StateSerializerImpl, () => {
   let serializer: StateSerializerImpl;

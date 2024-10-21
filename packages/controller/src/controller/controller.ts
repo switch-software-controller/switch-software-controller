@@ -1,4 +1,8 @@
-import type { Controller, ControllerState, StateChanger } from "@switch-software-controller/controller-api";
+import type {
+  Controller,
+  ControllerState,
+  StateChanger,
+} from "@switch-software-controller/controller-api";
 import type { SerializedStateSender } from "./serialized-state-sender.ts";
 
 /**

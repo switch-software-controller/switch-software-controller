@@ -27,4 +27,5 @@ export const StickTiltPreset = {
   Bottom: 7,
   BottomRight: 8,
 } as const;
-export type StickTiltPreset = (typeof StickTiltPreset)[keyof typeof StickTiltPreset];
+export type StickTiltPreset =
+  (typeof StickTiltPreset)[keyof typeof StickTiltPreset];

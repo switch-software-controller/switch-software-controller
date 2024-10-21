@@ -1,8 +1,8 @@
+import type { CommandPath } from "@switch-software-controller/command-api";
 import {
   type PathJoiner,
   normalizeFileName,
 } from "@switch-software-controller/path-utils";
-import type { CommandPath } from "@switch-software-controller/command-api";
 
 /**
  * An implementation of the CommandPath interface.

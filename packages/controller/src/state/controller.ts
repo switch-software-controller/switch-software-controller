@@ -44,4 +44,3 @@ export class ControllerStateImpl implements ControllerState {
     return this.serializer.serialize(this);
   }
 }
-

@@ -1,8 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ControllerState } from "@switch-software-controller/controller-api";
-import { StatelessControllerImpl } from "./stateless-controller.ts";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  ButtonStateImpl,
+  ControllerStateImpl,
+  HatStateImpl,
+  StateSerializerImpl,
+  StickStateImpl,
+} from "../state";
 import type { SerializedStateSender } from "./serialized-state-sender.ts";
-import { ButtonStateImpl, ControllerStateImpl, HatStateImpl, StateSerializerImpl, StickStateImpl, } from "../state";
+import { StatelessControllerImpl } from "./stateless-controller.ts";
 
 function createControllerState(): ControllerState {
   return new ControllerStateImpl(

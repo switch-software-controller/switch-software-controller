@@ -20,4 +20,3 @@ export interface HatState {
    */
   reset(): void;
 }
-

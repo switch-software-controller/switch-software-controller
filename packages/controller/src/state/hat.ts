@@ -1,4 +1,4 @@
-import { Hat, type HatState, } from "@switch-software-controller/controller-api";
+import { Hat, type HatState } from "@switch-software-controller/controller-api";
 import { HatValue } from "../primitives";
 
 /**

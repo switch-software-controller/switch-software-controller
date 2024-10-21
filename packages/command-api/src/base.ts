@@ -702,8 +702,13 @@ export abstract class BaseCommand {
     duration?: number,
     interval?: number,
   ): Promise<void> {
-    await this.changeRepeat((state) => {
-      state.buttons.press(buttons);
-    }, 3, duration, interval);
+    await this.changeRepeat(
+      (state) => {
+        state.buttons.press(buttons);
+      },
+      3,
+      duration,
+      interval,
+    );
   }
 }

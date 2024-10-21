@@ -1,4 +1,4 @@
-import type { ControllerState } from './controller.ts';
+import type { ControllerState } from "./controller.ts";
 
 /**
  * Represents a state serializer.

@@ -1,4 +1,7 @@
-import type { ControllerState, StateSerializer, } from "@switch-software-controller/controller-api";
+import type {
+  ControllerState,
+  StateSerializer,
+} from "@switch-software-controller/controller-api";
 
 /**
  * Default Implementation of StateSerializer

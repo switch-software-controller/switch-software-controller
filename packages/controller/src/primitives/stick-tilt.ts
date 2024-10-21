@@ -1,11 +1,15 @@
-import { type StickTilt, StickTiltPreset } from '@switch-software-controller/controller-api';
+import {
+  type StickTilt,
+  StickTiltPreset,
+} from "@switch-software-controller/controller-api";
 
 export const StickTiltRange = {
   Min: 0,
   Center: 128,
   Max: 255,
 } as const;
-export type StickTiltRange = (typeof StickTiltRange)[keyof typeof StickTiltRange];
+export type StickTiltRange =
+  (typeof StickTiltRange)[keyof typeof StickTiltRange];
 
 export class StickTiltImpl implements StickTilt {
   readonly x: number;
@@ -87,4 +91,5 @@ export const StickTiltPresetDefault = {
   [StickTiltPreset.Bottom]: new StickTiltImpl({ angle: 270.0 }),
   [StickTiltPreset.BottomRight]: new StickTiltImpl({ angle: 315.0 }),
 } as const;
-export type StickTiltPresetDefault = (typeof StickTiltPresetDefault)[keyof typeof StickTiltPresetDefault];
+export type StickTiltPresetDefault =
+  (typeof StickTiltPresetDefault)[keyof typeof StickTiltPresetDefault];

@@ -28,4 +28,3 @@ export interface ButtonState {
    */
   reset(): void;
 }
-
