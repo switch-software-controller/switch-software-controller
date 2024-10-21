@@ -1,32 +1,10 @@
-import type { ElapsedTime } from "./elapsed-time.ts";
+import type { ElapsedTime, Timer } from "@switch-software-controller/timer-api";
 
 const secondsInMinute = 60;
 const secondsInHour = 3600; // 60 * 60
 const secondsInDay = 86400; // 60 * 60 * 24
 const minutesInHour = 60;
 const hoursInDay = 24;
-
-/**
- * A timer that can be started and stopped to measure elapsed time.
- */
-export interface Timer {
-  /**
-   * The elapsed time since the timer was started.
-   * If the timer is not running, the elapsed time is 0.
-   * If there is no valid stopped-time, it returns the elapsed time up to the current time.
-   */
-  readonly elapsedTime: ElapsedTime;
-
-  /**
-   * Starts the timer.
-   */
-  start(): void;
-
-  /**
-   * Stops the timer.
-   */
-  stop(): void;
-}
 
 /**
  * A default implementation of the `Timer` interface.

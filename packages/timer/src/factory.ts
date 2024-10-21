@@ -1,4 +1,5 @@
-import { type Timer, TimerImpl } from "./timer";
+import type { Timer } from "@switch-software-controller/timer-api";
+import { TimerImpl } from "./timer";
 
 /* v8 ignore start */
 function getSecondsElapsedSinceEpoch() {

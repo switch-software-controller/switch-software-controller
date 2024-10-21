@@ -1,5 +1,5 @@
 {
-  "name": "@switch-software-controller/timer",
+  "name": "@switch-software-controller/timer-api",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -7,13 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "vitest run",
-    "coverage": "vitest run --coverage",
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
-  },
-  "devDependencies": {
-    "@switch-software-controller/timer-api": "*"
   }
 }
