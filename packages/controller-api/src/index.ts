@@ -2,7 +2,6 @@ export {
   Button,
   Hat,
   type StickTilt,
-  StickTiltRange,
   StickTiltPreset,
 } from "./primitives";
 export type {
@@ -11,9 +10,9 @@ export type {
   StickState,
   ControllerState,
   StateSerializer,
-} from "./state.ts";
+} from "./state";
 export type {
   Controller,
   StatelessController,
   StateChanger,
-} from "./controller.ts";
+} from "./controller";

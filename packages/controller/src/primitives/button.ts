@@ -1,88 +1,90 @@
 /**
  * This module defines a set of constants representing button values.
  */
+import { Button } from "@switch-software-controller/controller-api";
 
 /**
  * Represents a set of button values.
+ * Each button is assigned a unique bitwise value.
  */
-export const Button = {
+export const ButtonValue = {
   /**
    * Represents no button.
    */
-  Noop: 0,
+  [Button.Noop]: 0,
 
   /**
    * Represents the Y button.
    */
-  Y: 1,
+  [Button.Y]: 1, // 1 << 0,
 
   /**
    * Represents the X button.
    */
-  B: 2,
+  [Button.B]: 2, // 1 << 1,
 
   /**
    * Represents the A button.
    */
-  A: 3,
+  [Button.A]: 4, // 1 << 2,
 
   /**
    * Represents the X button.
    */
-  X: 4,
+  [Button.X]: 8, // 1 << 3,
 
   /**
    * Represents the L button.
    */
-  L: 5,
+  [Button.L]: 16, // 1 << 4,
 
   /**
    * Represents the R button.
    */
-  R: 6,
+  [Button.R]: 32, // 1 << 5,
 
   /**
    * Represents the ZL button.
    */
-  ZL: 7,
+  [Button.ZL]: 64, // 1 << 6,
 
   /**
    * Represents the ZR button.
    */
-  ZR: 8,
+  [Button.ZR]: 128, // 1 << 7,
 
   /**
    * Represents the minus button.
    */
-  Minus: 9,
+  [Button.Minus]: 256, // 1 << 8,
 
   /**
    * Represents the plus button.
    */
-  Plus: 10,
+  [Button.Plus]: 512, // 1 << 9,
 
   /**
    * Represents the LStick button.
    */
-  LStick: 11,
+  [Button.LStick]: 1024, // 1 << 10,
 
   /**
    * Represents the RStick button
    */
-  RStick: 12,
+  [Button.RStick]: 2048, // 1 << 11,
 
   /**
    * Represents the home button.
    */
-  Home: 13,
+  [Button.Home]: 4096, // 1 << 12,
 
   /**
    * Represents the capture button.
    */
-  Capture: 14,
+  [Button.Capture]: 8192, // 1 << 13,
 } as const;
 
 /**
  * Represents a button value.
  */
-export type Button = (typeof Button)[keyof typeof Button];
+export type ButtonValue = (typeof ButtonValue)[keyof typeof ButtonValue];

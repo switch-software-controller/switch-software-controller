@@ -1,4 +1,11 @@
-import { StickTiltRange, type StickTilt, StickTiltPreset } from '@switch-software-controller/controller-api';
+import { type StickTilt, StickTiltPreset } from '@switch-software-controller/controller-api';
+
+export const StickTiltRange = {
+  Min: 0,
+  Center: 128,
+  Max: 255,
+} as const;
+export type StickTiltRange = (typeof StickTiltRange)[keyof typeof StickTiltRange];
 
 export class StickTiltImpl implements StickTilt {
   readonly x: number;
