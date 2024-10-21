@@ -1,3 +1,5 @@
+import type { Lang } from "./lang.ts";
+
 /**
  * Command information.
  */
@@ -6,7 +8,7 @@ export type CommandInfo = {
    * Command name.
    */
   name: {
-    [lang: string]: string;
+    [lang in Lang]: string;
   };
 
   /**
@@ -18,7 +20,7 @@ export type CommandInfo = {
    * Command description.
    */
   description: {
-    [lang: string]: string;
+    [lang in Lang]: string;
   };
 
   /**

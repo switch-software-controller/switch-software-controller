@@ -2,12 +2,13 @@ import {
   Button,
   type Controller,
   Hat,
+  type StateChanger,
   type StatelessController,
   type StickTilt,
   StickTiltPreset,
-} from "@switch-software-controller/controller";
-import type { Logger } from "@switch-software-controller/logger";
-import type { ElapsedTime, Timer } from "@switch-software-controller/timer";
+} from "@switch-software-controller/controller-api";
+import type { Logger } from "@switch-software-controller/logger-api";
+import type { ElapsedTime, Timer } from "@switch-software-controller/timer-api";
 import type { CommandPath } from "./path.ts";
 
 /**
@@ -40,9 +41,15 @@ export function checkCancelled(): MethodDecorator {
 }
 
 /**
- * A function that waits for a specified duration.
+ * Waiter interface.
  */
-export type Waiter = (duration: number) => Promise<void>;
+export interface Waiter {
+  /**
+   * Wait for a specified duration.
+   * @param duration
+   */
+  wait(duration: number): Promise<void>;
+}
 
 /**
  * A base class for a command.
@@ -53,10 +60,16 @@ export abstract class BaseCommand {
   private _attemptCount = 0;
 
   /**
-   * The default duration for button presses.
+   * The default duration for controller sends.
    * @private
    */
-  private defaultDuration: number | undefined = undefined;
+  private _defaultDuration = 100;
+
+  /**
+   * The default interval between controller sends.
+   * @private
+   */
+  private _defaultInterval = 100;
 
   constructor(
     /**
@@ -86,7 +99,7 @@ export abstract class BaseCommand {
     /**
      * A function that waits for a specified duration.
      */
-    private readonly wait: Waiter,
+    private readonly waiter: Waiter,
   ) {}
 
   /**
@@ -111,6 +124,38 @@ export abstract class BaseCommand {
    */
   get elapsedTime(): ElapsedTime {
     return this.timer.elapsedTime;
+  }
+
+  /**
+   * The default duration for controller sends.
+   */
+  get defaultDuration(): number {
+    return this._defaultDuration;
+  }
+
+  /**
+   * Set the default duration for controller sends.
+   */
+  set defaultDuration(duration: number) {
+    if (duration !== null && duration !== undefined && duration > 0) {
+      this._defaultDuration = duration;
+    }
+  }
+
+  /**
+   * The default interval between controller sends.
+   */
+  get defaultInterval(): number {
+    return this._defaultInterval;
+  }
+
+  /**
+   * Set the default interval between controller sends.
+   */
+  set defaultInterval(interval: number) {
+    if (interval !== null && interval !== undefined && interval > 0) {
+      this._defaultInterval = interval;
+    }
   }
 
   /**
@@ -149,47 +194,136 @@ export abstract class BaseCommand {
   }
 
   /**
-   * Shortcut for `this.controller.sendWithReset((state) => {state.buttons.hold(buttons)}, duration)`.;
+   * Wait for a specified duration.
+   * @param duration duration to wait
+   * @param checkInterval interval to check the cancellation
+   */
+  @checkCancelled()
+  async wait(duration: number, checkInterval = 1000): Promise<void> {
+    if (duration <= 0) {
+      return;
+    }
+
+    // 1000 <= interval <= 10000
+    const interval = Math.min(10000, Math.max(checkInterval, 1000));
+
+    if (duration <= interval) {
+      await this.waiter.wait(duration);
+      return;
+    }
+
+    for (let i = 0; i < duration / interval; i++) {
+      await this.waiter.wait(interval);
+      if (this.isCancelled) {
+        throw new CommandCancelledError();
+      }
+    }
+    await this.waiter.wait(duration % interval);
+  }
+
+  /**
+   * Press the buttons for a specified duration.
    * @param buttons buttons to press
    * @param duration duration to press the buttons
    */
-  async pressButtons(buttons: Button[], duration?: number): Promise<void> {
-    return this.controller.sendWithReset((state) => {
-      state.buttons.hold(buttons);
-    }, duration ?? this.defaultDuration);
+  async pressButtons(
+    buttons: Button[],
+    duration: number = this.defaultDuration,
+  ): Promise<void> {
+    this.controller.send((state) => {
+      state.buttons.press(buttons);
+    });
+    await this.wait(duration ?? this.defaultDuration);
+    this.controller.send((state) => {
+      state.buttons.reset();
+    });
   }
 
   /**
-   * Shortcut for `this.controller.sendWithReset((state) => {state.hat.hold(hat)}, duration)`.
+   * Press the hat for a specified duration.
    * @param hat hat to press
    * @param duration duration to press the hat
    */
-  async pressHat(hat: Hat, duration?: number): Promise<void> {
-    return this.controller.sendWithReset((state) => {
-      state.hat.hold(hat);
-    }, duration ?? this.defaultDuration);
+  async pressHat(
+    hat: Hat,
+    duration: number = this.defaultDuration,
+  ): Promise<void> {
+    this.controller.send((state) => {
+      state.hat.press(hat);
+    });
+    await this.wait(duration ?? this.defaultDuration);
+    this.controller.send((state) => {
+      state.hat.reset();
+    });
   }
 
   /**
-   * Shortcut for `this.controller.sendWithReset((state) => {state.lStick.tilt = tilt}, duration)`.
+   * Tilt LStick for a specified duration.
    * @param tilt tilt to set
    * @param duration duration to set the tilt
    */
-  async tiltLStick(tilt: StickTilt, duration?: number): Promise<void> {
-    return this.controller.sendWithReset((state) => {
+  async tiltLStick(
+    tilt: StickTilt,
+    duration: number = this.defaultDuration,
+  ): Promise<void> {
+    this.controller.send((state) => {
       state.lStick.tilt = tilt;
-    }, duration ?? this.defaultDuration);
+    });
+    await this.wait(duration ?? this.defaultDuration);
+    this.controller.send((state) => {
+      state.lStick.tiltPreset = StickTiltPreset.Neutral;
+    });
   }
 
   /**
-   * Shortcut for `this.controller.sendWithReset((state) => {state.rStick.tilt = tilt}, duration)`.
+   * Tilt RStick for a specified duration.
    * @param tilt tilt to set
    * @param duration duration to set the tilt
    */
   async tiltRStick(tilt: StickTilt, duration?: number): Promise<void> {
-    return this.controller.sendWithReset((state) => {
+    this.controller.send((state) => {
       state.rStick.tilt = tilt;
-    }, duration ?? this.defaultDuration);
+    });
+    await this.wait(duration ?? this.defaultDuration);
+    this.controller.send((state) => {
+      state.rStick.tiltPreset = StickTiltPreset.Neutral;
+    });
+  }
+
+  /**
+   * Tilt LStick by a preset for a specified duration.
+   * @param preset
+   * @param duration
+   */
+  async tiltLStickByPreset(
+    preset: StickTiltPreset,
+    duration?: number,
+  ): Promise<void> {
+    this.controller.send((state) => {
+      state.lStick.tiltPreset = preset;
+    });
+    await this.wait(duration ?? this.defaultDuration);
+    this.controller.send((state) => {
+      state.lStick.tiltPreset = StickTiltPreset.Neutral;
+    });
+  }
+
+  /**
+   * Tilt RStick by a preset for a specified duration.
+   * @param preset
+   * @param duration
+   */
+  async tiltRStickByPreset(
+    preset: StickTiltPreset,
+    duration?: number,
+  ): Promise<void> {
+    this.controller.send((state) => {
+      state.rStick.tiltPreset = preset;
+    });
+    await this.wait(duration ?? this.defaultDuration);
+    this.controller.send((state) => {
+      state.rStick.tiltPreset = StickTiltPreset.Neutral;
+    });
   }
 
   /**
@@ -390,7 +524,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickTop(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.Top, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.Top, duration);
   }
 
   /**
@@ -398,7 +532,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickTopRight(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.TopRight, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.TopRight, duration);
   }
 
   /**
@@ -406,7 +540,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickRight(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.Right, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.Right, duration);
   }
 
   /**
@@ -414,7 +548,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickBottomRight(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.BottomRight, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.BottomRight, duration);
   }
 
   /**
@@ -422,7 +556,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickBottom(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.Bottom, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.Bottom, duration);
   }
 
   /**
@@ -430,7 +564,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickBottomLeft(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.BottomLeft, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.BottomLeft, duration);
   }
 
   /**
@@ -438,7 +572,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickLeft(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.Left, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.Left, duration);
   }
 
   /**
@@ -446,7 +580,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickTopLeft(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.TopLeft, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.TopLeft, duration);
   }
 
   /**
@@ -454,7 +588,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltLStickNeutral(duration?: number): Promise<void> {
-    return this.tiltLStick(StickTiltPreset.Neutral, duration);
+    return this.tiltLStickByPreset(StickTiltPreset.Neutral, duration);
   }
 
   /**
@@ -462,7 +596,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickTop(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.Top, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.Top, duration);
   }
 
   /**
@@ -470,7 +604,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickTopRight(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.TopRight, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.TopRight, duration);
   }
 
   /**
@@ -478,7 +612,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickRight(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.Right, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.Right, duration);
   }
 
   /**
@@ -486,7 +620,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickBottomRight(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.BottomRight, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.BottomRight, duration);
   }
 
   /**
@@ -494,7 +628,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickBottom(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.Bottom, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.Bottom, duration);
   }
 
   /**
@@ -502,7 +636,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickBottomLeft(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.BottomLeft, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.BottomLeft, duration);
   }
 
   /**
@@ -510,7 +644,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickLeft(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.Left, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.Left, duration);
   }
 
   /**
@@ -518,7 +652,7 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickTopLeft(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.TopLeft, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.TopLeft, duration);
   }
 
   /**
@@ -526,7 +660,34 @@ export abstract class BaseCommand {
    * @param duration
    */
   async tiltRStickNeutral(duration?: number): Promise<void> {
-    return this.tiltRStick(StickTiltPreset.Neutral, duration);
+    return this.tiltRStickByPreset(StickTiltPreset.Neutral, duration);
+  }
+
+  /**
+   * Repeat the state change for a specified number of times.
+   * @param stateChanger
+   * @param times number of times to repeat
+   * @param duration duration to keep the state
+   * @param interval interval between state changes
+   */
+  async changeRepeat(
+    stateChanger: StateChanger,
+    times: number,
+    duration?: number,
+    interval?: number,
+  ): Promise<void> {
+    for (let i = 0; i < times; i++) {
+      this.controller.send(stateChanger);
+      await this.wait(duration ?? this.defaultDuration);
+      this.reset();
+      await this.wait(interval ?? this.defaultInterval);
+    }
+  }
+
+  reset() {
+    this.controller.send((state) => {
+      state.reset();
+    });
   }
 
   /**
@@ -541,145 +702,8 @@ export abstract class BaseCommand {
     duration?: number,
     interval?: number,
   ): Promise<void> {
-    return this.controller.sendRepeat(
-      (state) => {
-        state.buttons.hold(buttons);
-      },
-      {
-        times: 3,
-        duration: duration ?? this.defaultDuration,
-        interval: interval,
-      },
-    );
-  }
-
-  /**
-   * Wait for a specified duration.
-   * This is intended to be executed when a long wait is required.
-   * It checks periodically whether the command has been canceled.
-   * If the command has been canceled, the method's execution is interrupted by throwing an error.
-   * @param duration
-   * @param checkInterval
-   */
-  async waitPatiently(duration: number, checkInterval = 1.0): Promise<void> {
-    const interval = checkInterval <= 0 ? 1.0 : checkInterval;
-
-    for (let i = 0; i < duration / interval; i++) {
-      await this.wait(interval);
-      if (this.isCancelled) {
-        throw new CommandCancelledError();
-      }
-    }
-  }
-
-  /**
-   * Go to the home screen.
-   */
-  @checkCancelled()
-  async gotoHomeScreen(): Promise<void> {
-    await this.pressHome(100);
-    await this.wait(1000);
-  }
-
-  /**
-   * A method that shifts the Nintendo Switch's current time by the specified `diff`.
-   * @param diff
-   * @param toggleAuto
-   * @param withReset
-   */
-  async shiftTime(
-    diff: {
-      years?: number;
-      months?: number;
-      days?: number;
-      hours?: number;
-      minutes?: number;
-    },
-    toggleAuto: boolean,
-    withReset: boolean,
-  ): Promise<void> {
-    const { years = 0, months = 0, days = 0, hours = 0, minutes = 0 } = diff;
-
-    // Go to the home screen
-    await this.gotoHomeScreen();
-
-    // Go to the System Settings
-    await this.tiltLStickBottom(100);
-    for (let i = 0; i < 5; i++) {
-      await this.tiltLStickRight(100);
-      await this.wait(100);
-    }
-    await this.pressA(100);
-    await this.wait(1500);
-    this.checkCancelled();
-
-    // Go to System
-    for (let i = 0; i < 2; i++) {
-      await this.tiltLStickBottom(100);
-      await this.wait(100);
-    }
-    await this.wait(300);
-    await this.pressA(100);
-    await this.wait(200);
-    this.checkCancelled();
-
-    // Go to Date and Time
-    await this.tiltLStickBottom(700);
-    await this.wait(200);
-    await this.pressA(100);
-    await this.wait(200);
-    this.checkCancelled();
-
-    // Reset the date and time
-    if (withReset) {
-      await this.pressA(100);
-      await this.wait(200);
-      await this.pressA(100);
-      await this.wait(200);
-    }
-    this.checkCancelled();
-
-    // Toggle Auto Time Sync Setting
-    if (toggleAuto) {
-      await this.pressA(100);
-      await this.wait(200);
-    }
-    this.checkCancelled();
-
-    // Go to Current Date and Time
-    for (let i = 0; i < 2; i++) {
-      await this.tiltLStickBottom(100);
-      await this.wait(100);
-    }
-    await this.pressA(100);
-    await this.wait(200);
-    this.checkCancelled();
-
-    // Set the date and time
-    const shiftTime = async (diff: number) => {
-      const tiltStick = diff < 0 ? this.tiltLStickBottom : this.tiltLStickTop;
-      for (let i = 0; i < Math.abs(diff); i++) {
-        await tiltStick(100);
-        await this.wait(100);
-        this.checkCancelled();
-      }
-      await this.tiltLStickRight(100);
-      await this.wait(100);
-    };
-    for (const d of [years, months, days, hours, minutes]) {
-      await shiftTime(d);
-      this.checkCancelled();
-    }
-    await this.pressA(100);
-  }
-
-  /**
-   * Check whether the command has been cancelled.
-   * @private
-   */
-  private checkCancelled() {
-    if (this.isCancelled) {
-      throw new CommandCancelledError();
-    }
+    await this.changeRepeat((state) => {
+      state.buttons.press(buttons);
+    }, 3, duration, interval);
   }
 }
