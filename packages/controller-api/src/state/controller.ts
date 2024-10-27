@@ -41,9 +41,4 @@ export interface ControllerState {
    * Use this method after consuming the stick state.
    */
   consumeSticks(): void;
-
-  /**
-   * Serializes the controller state to a string.
-   */
-  serialize(): string;
 }

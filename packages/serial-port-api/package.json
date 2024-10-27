@@ -1,5 +1,5 @@
 {
-  "name": "@switch-software-controller/command-api",
+  "name": "@switch-software-controller/serial-port-api",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -10,11 +10,5 @@
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
-  },
-  "dependencies": {
-    "@switch-software-controller/controller-api": "*",
-    "@switch-software-controller/logger-api": "*",
-    "@switch-software-controller/path-utils": "*",
-    "@switch-software-controller/timer-api": "*"
   }
 }

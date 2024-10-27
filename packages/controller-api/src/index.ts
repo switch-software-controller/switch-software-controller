@@ -9,10 +9,8 @@ export type {
   HatState,
   StickState,
   ControllerState,
-  StateSerializer,
 } from "./state";
 export type {
   Controller,
-  StatelessController,
   StateChanger,
 } from "./controller";

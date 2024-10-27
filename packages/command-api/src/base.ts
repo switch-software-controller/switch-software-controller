@@ -3,7 +3,6 @@ import {
   type Controller,
   Hat,
   type StateChanger,
-  type StatelessController,
   type StickTilt,
   StickTiltPreset,
 } from "@switch-software-controller/controller-api";
@@ -55,9 +54,35 @@ export interface Waiter {
  * A base class for a command.
  */
 export abstract class BaseCommand {
-  private _isCancelled = false;
+  /**
+   * The name of the command.
+   */
+  readonly name: string;
 
-  private _attemptCount = 0;
+  /**
+   * The path for the command.
+   */
+  readonly path: CommandPath;
+
+  /**
+   * The controller for the command.
+   */
+  readonly controller: Controller;
+
+  /**
+   * The timer for the command.
+   */
+  readonly timer: Timer;
+
+  /**
+   * The logger for the command.
+   */
+  readonly logger: Logger;
+
+  /**
+   * A function that waits for a specified duration.
+   */
+  private readonly waiter: Waiter;
 
   /**
    * The default duration for controller sends.
@@ -71,36 +96,25 @@ export abstract class BaseCommand {
    */
   private _defaultInterval = 100;
 
+  private _isCancelled = false;
+
+  private _attemptCount = 0;
+
   constructor(
-    /**
-     * The name of the command.
-     */
-    readonly name: string,
-    /**
-     * The path for the command.
-     */
-    readonly path: CommandPath,
-    /**
-     * The controller for the command.
-     */
-    readonly controller: Controller,
-    /**
-     * The stateless controller for the command.
-     */
-    readonly statelessController: StatelessController,
-    /**
-     * The timer for the command.
-     */
-    readonly timer: Timer,
-    /**
-     * The logger for the command.
-     */
-    readonly logger: Logger,
-    /**
-     * A function that waits for a specified duration.
-     */
-    private readonly waiter: Waiter,
-  ) {}
+    name: string,
+    path: CommandPath,
+    controller: Controller,
+    timer: Timer,
+    logger: Logger,
+    waiter: Waiter,
+  ) {
+    this.name = name;
+    this.path = path;
+    this.controller = controller;
+    this.timer = timer;
+    this.logger = logger;
+    this.waiter = waiter;
+  }
 
   /**
    * A flag indicating whether the command is cancelled.
@@ -158,6 +172,20 @@ export abstract class BaseCommand {
     }
   }
 
+  async execute() {
+    try {
+      this.preprocess();
+      await this.process();
+    } catch (error) {
+      if (!(error instanceof CommandCancelledError)) {
+        throw error;
+      }
+      this.logger.error(error.message);
+    } finally {
+      this.postprocess();
+    }
+  }
+
   /**
    * Stop the command.
    */
@@ -189,7 +217,8 @@ export abstract class BaseCommand {
   /**
    * Increase the attempt count.
    */
-  attempt() {
+  @checkCancelled()
+  attempt(): void {
     this._attemptCount++;
   }
 
@@ -226,6 +255,7 @@ export abstract class BaseCommand {
    * @param buttons buttons to press
    * @param duration duration to press the buttons
    */
+  @checkCancelled()
   async pressButtons(
     buttons: Button[],
     duration: number = this.defaultDuration,
@@ -244,6 +274,7 @@ export abstract class BaseCommand {
    * @param hat hat to press
    * @param duration duration to press the hat
    */
+  @checkCancelled()
   async pressHat(
     hat: Hat,
     duration: number = this.defaultDuration,
@@ -262,6 +293,7 @@ export abstract class BaseCommand {
    * @param tilt tilt to set
    * @param duration duration to set the tilt
    */
+  @checkCancelled()
   async tiltLStick(
     tilt: StickTilt,
     duration: number = this.defaultDuration,
@@ -280,6 +312,7 @@ export abstract class BaseCommand {
    * @param tilt tilt to set
    * @param duration duration to set the tilt
    */
+  @checkCancelled()
   async tiltRStick(tilt: StickTilt, duration?: number): Promise<void> {
     this.controller.send((state) => {
       state.rStick.tilt = tilt;
@@ -295,6 +328,7 @@ export abstract class BaseCommand {
    * @param preset
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickByPreset(
     preset: StickTiltPreset,
     duration?: number,
@@ -313,6 +347,7 @@ export abstract class BaseCommand {
    * @param preset
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickByPreset(
     preset: StickTiltPreset,
     duration?: number,
@@ -327,18 +362,10 @@ export abstract class BaseCommand {
   }
 
   /**
-   * Hold the serialized state.
-   * Shortcut for `this.statelessController.send(serializedState)`.
-   * @param serializedState serialized state to hold
-   */
-  holdSerialized(serializedState: string): void {
-    this.statelessController.send(serializedState);
-  }
-
-  /**
    * Press A button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressA(duration?: number): Promise<void> {
     return this.pressButtons([Button.A], duration);
   }
@@ -347,6 +374,7 @@ export abstract class BaseCommand {
    * Press B button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressB(duration?: number): Promise<void> {
     return this.pressButtons([Button.B], duration);
   }
@@ -355,6 +383,7 @@ export abstract class BaseCommand {
    * Press X button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressX(duration?: number): Promise<void> {
     return this.pressButtons([Button.X], duration);
   }
@@ -363,6 +392,7 @@ export abstract class BaseCommand {
    * Press Y button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressY(duration?: number): Promise<void> {
     return this.pressButtons([Button.Y], duration);
   }
@@ -371,6 +401,7 @@ export abstract class BaseCommand {
    * Press L button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressL(duration?: number): Promise<void> {
     return this.pressButtons([Button.L], duration);
   }
@@ -379,6 +410,7 @@ export abstract class BaseCommand {
    * Press R button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressR(duration?: number): Promise<void> {
     return this.pressButtons([Button.R], duration);
   }
@@ -387,6 +419,7 @@ export abstract class BaseCommand {
    * Press ZL button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressZL(duration?: number): Promise<void> {
     return this.pressButtons([Button.ZL], duration);
   }
@@ -395,6 +428,7 @@ export abstract class BaseCommand {
    * Press ZR button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressZR(duration?: number): Promise<void> {
     return this.pressButtons([Button.ZR], duration);
   }
@@ -403,6 +437,7 @@ export abstract class BaseCommand {
    * Press LStick for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressLStick(duration?: number): Promise<void> {
     return this.pressButtons([Button.LStick], duration);
   }
@@ -411,6 +446,7 @@ export abstract class BaseCommand {
    * Press RStick for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressRStick(duration?: number): Promise<void> {
     return this.pressButtons([Button.RStick], duration);
   }
@@ -419,6 +455,7 @@ export abstract class BaseCommand {
    * Press Plus button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressPlus(duration?: number): Promise<void> {
     return this.pressButtons([Button.Plus], duration);
   }
@@ -427,6 +464,7 @@ export abstract class BaseCommand {
    * Press Minus button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressMinus(duration?: number): Promise<void> {
     return this.pressButtons([Button.Minus], duration);
   }
@@ -435,6 +473,7 @@ export abstract class BaseCommand {
    * Press Home button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHome(duration?: number): Promise<void> {
     return this.pressButtons([Button.Home], duration);
   }
@@ -443,6 +482,7 @@ export abstract class BaseCommand {
    * Press Capture button for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressCapture(duration?: number): Promise<void> {
     return this.pressButtons([Button.Capture], duration);
   }
@@ -451,6 +491,7 @@ export abstract class BaseCommand {
    * Press Hat Top for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatTop(duration?: number): Promise<void> {
     return this.pressHat(Hat.Top, duration);
   }
@@ -459,6 +500,7 @@ export abstract class BaseCommand {
    * Press Hat Top Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatTopRight(duration?: number): Promise<void> {
     return this.pressHat(Hat.TopRight, duration);
   }
@@ -467,6 +509,7 @@ export abstract class BaseCommand {
    * Press Hat Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatRight(duration?: number): Promise<void> {
     return this.pressHat(Hat.Right, duration);
   }
@@ -475,6 +518,7 @@ export abstract class BaseCommand {
    * Press Hat Bottom Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatBottomRight(duration?: number): Promise<void> {
     return this.pressHat(Hat.BottomRight, duration);
   }
@@ -483,6 +527,7 @@ export abstract class BaseCommand {
    * Press Hat Bottom for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatBottom(duration?: number): Promise<void> {
     return this.pressHat(Hat.Bottom, duration);
   }
@@ -491,6 +536,7 @@ export abstract class BaseCommand {
    * Press Hat Bottom Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatBottomLeft(duration?: number): Promise<void> {
     return this.pressHat(Hat.BottomLeft, duration);
   }
@@ -499,6 +545,7 @@ export abstract class BaseCommand {
    * Press Hat Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatLeft(duration?: number): Promise<void> {
     return this.pressHat(Hat.Left, duration);
   }
@@ -507,6 +554,7 @@ export abstract class BaseCommand {
    * Press Hat Top Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatTopLeft(duration?: number): Promise<void> {
     return this.pressHat(Hat.TopLeft, duration);
   }
@@ -515,6 +563,7 @@ export abstract class BaseCommand {
    * Press Hat Neutral for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async pressHatNeutral(duration?: number): Promise<void> {
     return this.pressHat(Hat.Neutral, duration);
   }
@@ -523,6 +572,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Top for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickTop(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.Top, duration);
   }
@@ -531,6 +581,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Top Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickTopRight(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.TopRight, duration);
   }
@@ -539,6 +590,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickRight(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.Right, duration);
   }
@@ -547,6 +599,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Bottom Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickBottomRight(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.BottomRight, duration);
   }
@@ -555,6 +608,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Bottom for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickBottom(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.Bottom, duration);
   }
@@ -563,6 +617,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Bottom Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickBottomLeft(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.BottomLeft, duration);
   }
@@ -571,6 +626,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickLeft(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.Left, duration);
   }
@@ -579,6 +635,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Top Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickTopLeft(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.TopLeft, duration);
   }
@@ -587,6 +644,7 @@ export abstract class BaseCommand {
    * Tilt LStick to Neutral for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltLStickNeutral(duration?: number): Promise<void> {
     return this.tiltLStickByPreset(StickTiltPreset.Neutral, duration);
   }
@@ -595,6 +653,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Top for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickTop(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.Top, duration);
   }
@@ -603,6 +662,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Top Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickTopRight(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.TopRight, duration);
   }
@@ -611,6 +671,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickRight(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.Right, duration);
   }
@@ -619,6 +680,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Bottom Right for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickBottomRight(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.BottomRight, duration);
   }
@@ -627,6 +689,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Bottom for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickBottom(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.Bottom, duration);
   }
@@ -635,6 +698,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Bottom Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickBottomLeft(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.BottomLeft, duration);
   }
@@ -643,6 +707,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickLeft(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.Left, duration);
   }
@@ -651,6 +716,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Top Left for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickTopLeft(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.TopLeft, duration);
   }
@@ -659,6 +725,7 @@ export abstract class BaseCommand {
    * Tilt RStick to Neutral for a specified duration.
    * @param duration
    */
+  @checkCancelled()
   async tiltRStickNeutral(duration?: number): Promise<void> {
     return this.tiltRStickByPreset(StickTiltPreset.Neutral, duration);
   }
@@ -670,6 +737,7 @@ export abstract class BaseCommand {
    * @param duration duration to keep the state
    * @param interval interval between state changes
    */
+  @checkCancelled()
   async changeRepeat(
     stateChanger: StateChanger,
     times: number,
@@ -684,6 +752,7 @@ export abstract class BaseCommand {
     }
   }
 
+  @checkCancelled()
   reset() {
     this.controller.send((state) => {
       state.reset();
@@ -697,6 +766,7 @@ export abstract class BaseCommand {
    * @param duration
    * @param interval
    */
+  @checkCancelled()
   async getRecognition(
     buttons: Button[] = [Button.ZL],
     duration?: number,

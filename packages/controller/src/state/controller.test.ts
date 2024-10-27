@@ -13,7 +13,6 @@ import {
 import { ButtonStateImpl } from "./button.ts";
 import { ControllerStateImpl } from "./controller.ts";
 import { HatStateImpl } from "./hat.ts";
-import { StateSerializerImpl } from "./serializer.ts";
 import { StickStateImpl } from "./stick.ts";
 
 describe(ControllerStateImpl, () => {
@@ -21,7 +20,6 @@ describe(ControllerStateImpl, () => {
 
   beforeEach(() => {
     state = new ControllerStateImpl(
-      new StateSerializerImpl(),
       new ButtonStateImpl(),
       new HatStateImpl(),
       new StickStateImpl(),
@@ -37,7 +35,6 @@ describe(ControllerStateImpl, () => {
     expect(state.lStick.y).toBe(StickTiltRange.Center);
     expect(state.rStick.x).toBe(StickTiltRange.Center);
     expect(state.rStick.y).toBe(StickTiltRange.Center);
-    expect(state.serialize()).toBe("0x0000 8  ");
   });
 
   describe("state.buttons", () => {
@@ -267,7 +264,6 @@ describe(ControllerStateImpl, () => {
       expect(state.lStick.y).toBe(StickTiltRange.Center);
       expect(state.rStick.x).toBe(StickTiltRange.Center);
       expect(state.rStick.y).toBe(StickTiltRange.Center);
-      expect(state.serialize()).toBe("0x0003 8 80 80 80 80");
     });
   });
 
@@ -278,24 +274,6 @@ describe(ControllerStateImpl, () => {
       state.consumeSticks();
       expect(state.lStick.isDirty).toBe(false);
       expect(state.rStick.isDirty).toBe(false);
-    });
-  });
-
-  describe("serialize", () => {
-    it("should serialize the state", () => {
-      state.buttons.press([Button.A, Button.B]);
-      state.hat.press(Hat.Top);
-      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
-      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
-      expect(state.serialize()).toBe("0x001b 0 80 0 80 0");
-    });
-
-    it("should serialize the state", () => {
-      state.buttons.press([Button.A, Button.B, Button.Noop]);
-      state.hat.press(Hat.Top);
-      state.lStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
-      state.rStick.tilt = StickTiltPresetDefault[StickTiltPreset.Top];
-      expect(state.serialize()).toBe("0x001b 0 80 0 80 0");
     });
   });
 });
