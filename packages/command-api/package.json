@@ -14,7 +14,6 @@
   "dependencies": {
     "@switch-software-controller/controller-api": "*",
     "@switch-software-controller/logger-api": "*",
-    "@switch-software-controller/path-utils": "*",
     "@switch-software-controller/timer-api": "*"
   }
 }
