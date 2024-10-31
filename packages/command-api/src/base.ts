@@ -5,17 +5,17 @@ import {
   type StateChanger,
   type StickTilt,
   StickTiltPreset,
-} from "@switch-software-controller/controller-api";
-import type { Logger } from "@switch-software-controller/logger-api";
-import type { ElapsedTime, Timer } from "@switch-software-controller/timer-api";
-import type { CommandPath } from "./path.ts";
+} from '@switch-software-controller/controller-api';
+import type { Logger } from '@switch-software-controller/logger-api';
+import type { ElapsedTime, Timer } from '@switch-software-controller/timer-api';
+import type { CommandPath } from './path.ts';
 
 /**
  * An error that is thrown when the command is cancelled.
  */
 export class CommandCancelledError extends Error {
   constructor() {
-    super("The command has been cancelled.");
+    super('The command has been cancelled.');
   }
 }
 

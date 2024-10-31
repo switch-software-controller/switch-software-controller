@@ -1,6 +1,6 @@
-import type { ButtonState } from "./button.ts";
-import type { HatState } from "./hat.ts";
-import type { StickState } from "./stick.ts";
+import type { ButtonState } from './button.ts';
+import type { HatState } from './hat.ts';
+import type { StickState } from './stick.ts';
 
 /**
  * Represents the state of a controller.

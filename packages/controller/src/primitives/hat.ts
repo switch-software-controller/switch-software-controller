@@ -2,7 +2,7 @@
  * This module defines a set of constants representing hat directions.
  * Each direction is assigned a unique ordered value.
  */
-import { Hat } from "@switch-software-controller/controller-api";
+import { Hat } from '@switch-software-controller/controller-api';
 
 /**
  * Represents a hat direction.

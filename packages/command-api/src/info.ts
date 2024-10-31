@@ -1,4 +1,4 @@
-import type { Lang } from "./lang.ts";
+import type { Lang } from './lang.ts';
 
 /**
  * Command information.

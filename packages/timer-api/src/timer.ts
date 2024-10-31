@@ -1,4 +1,4 @@
-import type { ElapsedTime } from "./elapsed-time.ts";
+import type { ElapsedTime } from './elapsed-time.ts';
 
 /**
  * A timer that can be started and stopped to measure elapsed time.

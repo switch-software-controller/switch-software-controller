@@ -1,7 +1,7 @@
 /**
  * This module defines a set of constants representing button values.
  */
-import { Button } from "@switch-software-controller/controller-api";
+import { Button } from '@switch-software-controller/controller-api';
 
 /**
  * Represents a set of button values.

@@ -1,4 +1,4 @@
-import type { ElapsedTime, Timer } from "@switch-software-controller/timer-api";
+import type { ElapsedTime, Timer } from '@switch-software-controller/timer-api';
 
 const secondsInMinute = 60;
 const secondsInHour = 3600; // 60 * 60

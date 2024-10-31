@@ -1,1 +1,1 @@
-export { CommandPathImpl } from "./path.ts";
+export { CommandPathImpl } from './path.ts';

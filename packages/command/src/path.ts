@@ -1,15 +1,15 @@
-import type { CommandPath } from "@switch-software-controller/command-api";
+import type { CommandPath } from '@switch-software-controller/command-api';
 import {
   type PathJoiner,
   normalizeFileName,
-} from "@switch-software-controller/path-utils";
+} from '@switch-software-controller/path-utils';
 
 /**
  * An implementation of the CommandPath interface.
  */
 export class CommandPathImpl implements CommandPath {
   readonly root: string;
-  private _defaultImageExtension = "png";
+  private _defaultImageExtension = 'png';
 
   constructor(
     commandsRoot: string,
@@ -34,19 +34,19 @@ export class CommandPathImpl implements CommandPath {
   }
 
   get command() {
-    return this.join(this.root, "src", "index.ts");
+    return this.join(this.root, 'src', 'index.ts');
   }
 
   get info() {
-    return this.join(this.root, "info.json");
+    return this.join(this.root, 'info.json');
   }
 
   get templates() {
-    return this.join(this.root, "templates");
+    return this.join(this.root, 'templates');
   }
 
   get captures() {
-    return this.join(this.root, "captures");
+    return this.join(this.root, 'captures');
   }
 
   template(fileName: string, extension?: string) {
