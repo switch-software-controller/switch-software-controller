@@ -1,23 +1,23 @@
 import type { Lang } from './lang.ts';
 
 /**
- * Command information.
+ * Macro information.
  */
-export type CommandInfo = {
+export type MacroInfo = {
   /**
-   * Command name.
+   * Macro name.
    */
   name: {
     [lang in Lang]: string;
   };
 
   /**
-   * Command version.
+   * Macro version.
    */
   version: string;
 
   /**
-   * Command description.
+   * Macro description.
    */
   description: {
     [lang in Lang]: string;
@@ -30,11 +30,11 @@ export type CommandInfo = {
 };
 
 /**
- * Command information reader.
+ * Macro information reader.
  */
 export interface CommandInfoReader {
   /**
-   * Read command information.
+   * Read macro information.
    */
-  read(): CommandInfo;
+  read(): MacroInfo;
 }

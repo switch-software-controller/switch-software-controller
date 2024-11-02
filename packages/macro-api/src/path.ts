@@ -1,7 +1,7 @@
 /**
- * An interface for retrieving the path used by the command.
+ * An interface for retrieving the path used by the macro.
  */
-export interface CommandPath {
+export interface MacroPath {
   /**
    * Default image extension for `capture` and `template` methods.
    */
@@ -12,10 +12,10 @@ export interface CommandPath {
    */
   get root(): string;
 
-  get command(): string;
+  get macro(): string;
 
   /**
-   * Command Info path.
+   * Macro Info path.
    */
   get info(): string;
 

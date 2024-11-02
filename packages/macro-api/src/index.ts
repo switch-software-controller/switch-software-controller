@@ -1,11 +1,11 @@
 export type {
-  CommandInfo,
+  MacroInfo,
   CommandInfoReader,
 } from './info.ts';
-export type { CommandPath } from './path.ts';
+export type { MacroPath } from './path.ts';
 export {
   type Waiter,
-  BaseCommand,
-  CommandCancelledError,
+  BaseMacro,
+  MacroCancelledError,
   checkCancelled,
 } from './base.ts';

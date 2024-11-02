@@ -1,5 +1,5 @@
 {
-  "name": "@switch-software-controller/command-api",
+  "name": "@switch-software-controller/macro-api",
   "version": "0.1.0",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",

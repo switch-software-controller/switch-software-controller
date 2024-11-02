@@ -8,19 +8,19 @@ import {
 } from '@switch-software-controller/controller-api';
 import type { Logger } from '@switch-software-controller/logger-api';
 import type { ElapsedTime, Timer } from '@switch-software-controller/timer-api';
-import type { CommandPath } from './path.ts';
+import type { MacroPath } from './path.ts';
 
 /**
- * An error that is thrown when the command is cancelled.
+ * An error that is thrown when the macro is cancelled.
  */
-export class CommandCancelledError extends Error {
+export class MacroCancelledError extends Error {
   constructor() {
-    super('The command has been cancelled.');
+    super('The macro has been cancelled.');
   }
 }
 
 /**
- * A decorator that checks whether the command has been cancelled.
+ * A decorator that checks whether the macro has been cancelled.
  */
 export function checkCancelled(): MethodDecorator {
   return (_target, _propertyKey, descriptor) => {
@@ -32,7 +32,7 @@ export function checkCancelled(): MethodDecorator {
       // biome-ignore lint/suspicious/noExplicitAny:
       const isCancelled: boolean = (this as any).isCancelled ?? false;
       if (isCancelled) {
-        throw new CommandCancelledError();
+        throw new MacroCancelledError();
       }
       return ret;
     };
@@ -51,31 +51,31 @@ export interface Waiter {
 }
 
 /**
- * A base class for a command.
+ * A base class for a macro.
  */
-export abstract class BaseCommand {
+export abstract class BaseMacro {
   /**
-   * The name of the command.
+   * The name of the macro.
    */
   readonly name: string;
 
   /**
-   * The path for the command.
+   * The path for the macro.
    */
-  readonly path: CommandPath;
+  readonly path: MacroPath;
 
   /**
-   * The controller for the command.
+   * The controller for the macro.
    */
   readonly controller: Controller;
 
   /**
-   * The timer for the command.
+   * The timer for the macro.
    */
   readonly timer: Timer;
 
   /**
-   * The logger for the command.
+   * The logger for the macro.
    */
   readonly logger: Logger;
 
@@ -102,7 +102,7 @@ export abstract class BaseCommand {
 
   constructor(
     name: string,
-    path: CommandPath,
+    path: MacroPath,
     controller: Controller,
     timer: Timer,
     logger: Logger,
@@ -117,7 +117,7 @@ export abstract class BaseCommand {
   }
 
   /**
-   * A flag indicating whether the command is cancelled.
+   * A flag indicating whether the macro is cancelled.
    */
   get isCancelled(): boolean {
     return this._isCancelled;
@@ -126,7 +126,7 @@ export abstract class BaseCommand {
   /**
    * The number of attempts.
    * It is expected that the number of times the main loop has been executed within
-   * the `process()` is being counted since this command started running.
+   * the `process()` is being counted since this macro started running.
    * This value should be incremented by the `attempt()` method.
    */
   get attemptCount(): number {
@@ -134,7 +134,7 @@ export abstract class BaseCommand {
   }
 
   /**
-   * The elapsed time since the command started.
+   * The elapsed time since the macro started.
    */
   get elapsedTime(): ElapsedTime {
     return this.timer.elapsedTime;
@@ -177,7 +177,7 @@ export abstract class BaseCommand {
       this.preprocess();
       await this.process();
     } catch (error) {
-      if (!(error instanceof CommandCancelledError)) {
+      if (!(error instanceof MacroCancelledError)) {
         throw error;
       }
       this.logger.error(error.message);
@@ -187,7 +187,7 @@ export abstract class BaseCommand {
   }
 
   /**
-   * Stop the command.
+   * Stop the macro.
    */
   cancel() {
     this._isCancelled = true;
@@ -199,7 +199,7 @@ export abstract class BaseCommand {
   abstract process(): Promise<void>;
 
   /**
-   * Preprocess the command.
+   * Preprocess the macro.
    */
   preprocess() {
     this.timer.start();
@@ -208,7 +208,7 @@ export abstract class BaseCommand {
   }
 
   /**
-   * Postprocess the command.
+   * Postprocess the macro.
    */
   postprocess() {
     this.timer.stop();
@@ -244,7 +244,7 @@ export abstract class BaseCommand {
     for (let i = 0; i < duration / interval; i++) {
       await this.waiter.wait(interval);
       if (this.isCancelled) {
-        throw new CommandCancelledError();
+        throw new MacroCancelledError();
       }
     }
     await this.waiter.wait(duration % interval);

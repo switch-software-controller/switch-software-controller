@@ -1,14 +1,14 @@
 import type { PathJoiner } from '@switch-software-controller/path-utils';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CommandPathImpl } from './path.ts';
+import { MacroPathImpl } from './path.ts';
 
-describe(CommandPathImpl, () => {
+describe(MacroPathImpl, () => {
   let joiner: PathJoiner;
-  let path: CommandPathImpl;
+  let path: MacroPathImpl;
 
   beforeEach(() => {
     joiner = (...args) => args.join('/');
-    path = new CommandPathImpl('./commandRoot', 'commandName', joiner);
+    path = new MacroPathImpl('./macroRoot', 'macroName', joiner);
   });
 
   describe('defaultImageExtension', () => {
@@ -34,44 +34,44 @@ describe(CommandPathImpl, () => {
 
   describe('root', () => {
     it('should return the root path', () => {
-      expect(path.root).toBe('./commandRoot/commandName');
+      expect(path.root).toBe('./macroRoot/macroName');
     });
   });
 
-  describe('command', () => {
-    it('should return the command path', () => {
-      expect(path.command).toBe('./commandRoot/commandName/src/index.ts');
+  describe('macro', () => {
+    it('should return the macro path', () => {
+      expect(path.macro).toBe('./macroRoot/macroName/src/index.ts');
     });
   });
 
   describe('info', () => {
     it('should return the info path', () => {
-      expect(path.info).toBe('./commandRoot/commandName/info.json');
+      expect(path.info).toBe('./macroRoot/macroName/info.json');
     });
   });
 
   describe('templates', () => {
     it('should return the templates path', () => {
-      expect(path.templates).toBe('./commandRoot/commandName/templates');
+      expect(path.templates).toBe('./macroRoot/macroName/templates');
     });
   });
 
   describe('captures', () => {
     it('should return the captures path', () => {
-      expect(path.captures).toBe('./commandRoot/commandName/captures');
+      expect(path.captures).toBe('./macroRoot/macroName/captures');
     });
   });
 
   describe('template', () => {
     it('should return the template path', () => {
       expect(path.template('file')).toBe(
-        './commandRoot/commandName/templates/file.png',
+        './macroRoot/macroName/templates/file.png',
       );
     });
 
     it('should return the template path with the specified extension', () => {
       expect(path.template('file', 'jpg')).toBe(
-        './commandRoot/commandName/templates/file.jpg',
+        './macroRoot/macroName/templates/file.jpg',
       );
     });
   });
@@ -79,13 +79,13 @@ describe(CommandPathImpl, () => {
   describe('capture', () => {
     it('should return the capture path', () => {
       expect(path.capture('file')).toBe(
-        './commandRoot/commandName/captures/file.png',
+        './macroRoot/macroName/captures/file.png',
       );
     });
 
     it('should return the capture path with the specified extension', () => {
       expect(path.capture('file', 'jpg')).toBe(
-        './commandRoot/commandName/captures/file.jpg',
+        './macroRoot/macroName/captures/file.jpg',
       );
     });
   });

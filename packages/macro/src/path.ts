@@ -1,22 +1,22 @@
-import type { CommandPath } from '@switch-software-controller/command-api';
+import type { MacroPath } from '@switch-software-controller/macro-api';
 import {
   type PathJoiner,
   normalizeFileName,
 } from '@switch-software-controller/path-utils';
 
 /**
- * An implementation of the CommandPath interface.
+ * An implementation of the MacroPath interface.
  */
-export class CommandPathImpl implements CommandPath {
+export class MacroPathImpl implements MacroPath {
   readonly root: string;
   private _defaultImageExtension = 'png';
 
   constructor(
-    commandsRoot: string,
-    readonly commandName: string,
+    macroRoot: string,
+    readonly macroName: string,
     private readonly join: PathJoiner,
   ) {
-    this.root = join(commandsRoot, commandName);
+    this.root = join(macroRoot, macroName);
   }
 
   get defaultImageExtension() {
@@ -33,7 +33,7 @@ export class CommandPathImpl implements CommandPath {
     }
   }
 
-  get command() {
+  get macro() {
     return this.join(this.root, 'src', 'index.ts');
   }
 
