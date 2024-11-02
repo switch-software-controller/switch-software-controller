@@ -3,6 +3,9 @@
   "productName": "Switch Software Controller",
   "version": "0.1.0",
   "description": "Software controller for Nintendo Switch",
+  "author": "carimatics",
+  "license": "MIT",
+  "keywords": [],
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
@@ -12,6 +15,12 @@
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
+  },
+  "dependencies": {
+    "@electron/remote": "2.1.2",
+    "@switch-software-controller/tailwind-config": "*",
+    "@switch-software-controller/timer": "*",
+    "electron-squirrel-startup": "1.0.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "7.5.0",
@@ -25,14 +34,5 @@
     "@electron/fuses": "1.8.0",
     "@types/electron-squirrel-startup": "1.0.2",
     "electron": "33.0.2"
-  },
-  "keywords": [],
-  "author": "carimatics",
-  "license": "MIT",
-  "dependencies": {
-    "@electron/remote": "2.1.2",
-    "@switch-software-controller/tailwind-config": "*",
-    "@switch-software-controller/timer": "*",
-    "electron-squirrel-startup": "1.0.1"
   }
 }
