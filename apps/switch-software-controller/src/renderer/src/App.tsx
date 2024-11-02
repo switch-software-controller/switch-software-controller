@@ -1,10 +1,43 @@
-import type React from "react";
+import type React from 'react';
+import { useEffect, useCallback, useMemo , useState} from "react";
 import { BsController } from "react-icons/bs";
 import { CiVideoOn } from "react-icons/ci";
 import { FaUsb } from "react-icons/fa";
+import path from 'node:path';
+import { app } from '@electron/remote';
+import { useVideo } from '@renderer/hooks/use-video';
+
+const dataDir = path.join(app.getPath('userData'), 'ssc-data');
+
+async function getVideoInputDevices() {
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  return devices.filter((device) => device.kind === 'videoinput');
+}
 
 function App(): React.JSX.Element {
   const videoElementId = "camera";
+  const videoElement = document.getElementById(videoElementId) as HTMLVideoElement;
+
+  const {
+    videoInputDevices,
+    setVideoInputDevices,
+    selectVideoInputDevice,
+    playVideo,
+    takeScreenshot,
+  } = useVideo(videoElement);
+
+  useEffect(() => {
+    getVideoInputDevices().then((devices) => {
+      setVideoInputDevices(devices);
+    });
+  }, [setVideoInputDevices])
+
+  useEffect(() => {
+    if (videoInputDevices.length > 0) {
+      selectVideoInputDevice(videoInputDevices[0].deviceId);
+    }
+  }, [videoInputDevices, selectVideoInputDevice]);
+
   return (
     <div className="h-dvh bg-surface">
       <div className="flex h-dvh">
@@ -14,12 +47,12 @@ function App(): React.JSX.Element {
             <div className="flex flex-1 flex-col gap-4 p-2">
               <div className="flex gap-2">
                 <CiVideoOn />
-                <select className="flex-1 bg-surface-dim">
-                  <option>Video1</option>
-                  <option>Video2</option>
-                  <option>Video3</option>
+                <select className="flex-1 bg-surface-dim" onChange={(event) => selectVideoInputDevice(event.target.value)}>
+                  {videoInputDevices.map((device) => {
+                    return <option key={device.deviceId} value={device.deviceId}>{device.label}</option>;
+                  })}
                 </select>
-                <button className="rounded-md bg-primary px-2 text-on-primary">
+                <button className="rounded-md bg-primary px-2 text-on-primary" onClick={playVideo}>
                   Connect
                 </button>
               </div>
@@ -46,7 +79,10 @@ function App(): React.JSX.Element {
                 </button>
               </div>
             </div>
-            <div className="flex flex-1 p-2">Macro</div>
+            <div className="flex flex-1 p-2">
+              Macro
+              <button onClick={() => takeScreenshot(path.join(dataDir, 'captures', 'screenshot.png'))}>Screenshot</button>
+            </div>
           </div>
         </div>
         <div className="flex h-full w-80 flex-col overflow-y-scroll border border-on-surface bg-surface-bright p-2 text-on-surface">

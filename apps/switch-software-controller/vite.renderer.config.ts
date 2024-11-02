@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'node:path';
+import renderer from 'vite-plugin-electron-renderer';
 
 // https://vitejs.dev/config
 export default defineConfig({
@@ -11,5 +12,13 @@ export default defineConfig({
         main_window: path.resolve(__dirname, 'src', 'renderer', 'index.html'),
       }
     }
-  }
+  },
+  resolve: {
+    alias: {
+      '@renderer': path.resolve(__dirname, 'src', 'renderer', 'src'),
+    }
+  },
+  plugins: [
+    renderer(),
+  ],
 });
