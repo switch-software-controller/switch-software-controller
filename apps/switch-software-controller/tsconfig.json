@@ -10,6 +10,11 @@
     "baseUrl": ".",
     "outDir": "dist",
     "moduleResolution": "nodenext",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "composite": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@renderer/*": ["src/renderer/src/*"]
+    }
   }
 }
