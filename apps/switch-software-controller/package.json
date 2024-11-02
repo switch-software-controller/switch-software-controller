@@ -30,6 +30,7 @@
   "author": "carimatics",
   "license": "MIT",
   "dependencies": {
+    "@electron/remote": "2.1.2",
     "@switch-software-controller/tailwind-config": "*",
     "@switch-software-controller/timer": "*",
     "electron-squirrel-startup": "1.0.1"
