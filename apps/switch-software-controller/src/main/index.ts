@@ -24,6 +24,7 @@ const createWindow = () => {
       sandbox: false,
       nodeIntegration: true,
       contextIsolation: false,
+      experimentalFeatures: true,
     },
   });
   remote.enable(mainWindow.webContents);
@@ -36,6 +37,27 @@ const createWindow = () => {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });
+
+  mainWindow.webContents.session.on('select-serial-port', (event, portList, webContents, callback) => {
+    mainWindow.webContents.session.on('serial-port-added', (event, port) => {
+      console.log('serial-port-added FIRED WITH', port);
+    });
+
+    mainWindow.webContents.session.on('serial-port-removed', (event, port) => {
+      console.log('serial-port-removed FIRED WITH', port);
+    });
+
+    event.preventDefault()
+    if (portList && portList.length > 0) {
+      callback(portList[0].portId);
+    } else {
+      callback('');
+    }
+  });
+
+  // permission handlers
+  mainWindow.webContents.session.setPermissionCheckHandler(() => true);
+  mainWindow.webContents.session.setDevicePermissionHandler(() => true);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

@@ -2,7 +2,7 @@ import path from 'node:path';
 import { app } from '@electron/remote';
 import { useVideo } from '@renderer/hooks/use-video';
 import type React from 'react';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BsController } from 'react-icons/bs';
 import { CiVideoOn } from 'react-icons/ci';
 import { FaUsb } from 'react-icons/fa';
@@ -19,6 +19,11 @@ function App(): React.JSX.Element {
   const videoElement = document.getElementById(
     videoElementId,
   ) as HTMLVideoElement;
+  const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
+  const [selectedPort, setSelectedPort] = useState<SerialPort | null>(
+    null,
+  );
+  const [port, setPort] = useState<SerialPort>(null);
 
   const {
     videoInputDevices,
@@ -39,6 +44,12 @@ function App(): React.JSX.Element {
       selectVideoInputDevice(videoInputDevices[0].deviceId);
     }
   }, [videoInputDevices, selectVideoInputDevice]);
+
+  const listPorts = useCallback(() => {
+    navigator.serial.getPorts().then((ports) => {
+      setSerialPorts(ports.filter((port) => port.connected));
+    });
+  }, []);
 
   return (
     <div className="h-dvh bg-surface">
@@ -72,12 +83,45 @@ function App(): React.JSX.Element {
               </div>
               <div className="flex gap-2">
                 <FaUsb />
-                <select className="flex-1 bg-surface-dim">
-                  <option>USB1</option>
-                  <option>USB2</option>
-                  <option>USB3</option>
+                <select
+                  className="flex-1 bg-surface-dim"
+                  onChange={(e) => {
+                    setSelectedPort(
+                      serialPorts.find((port) => {
+                        const info = port.getInfo();
+                        return `0x${info.usbVendorId.toString(16).padStart(4, '0')} | 0x${info.usbProductId.toString(16).padStart(4, '0')}` === e.target.value;
+                      }),
+                    );
+                  }}
+                >
+                  {serialPorts.map((port) => {
+                    const info = port.getInfo();
+                    const s = `0x${info.usbVendorId.toString(16).padStart(4, '0')} | 0x${info.usbProductId.toString(16).padStart(4, '0')}`;
+                    return (
+                      <option key={s} value={s}>{s}</option>
+                    );
+                  })}
                 </select>
-                <button className="rounded-md bg-primary px-2 text-on-primary">
+                <button
+                  className="rounded-md bg-primary px-2 text-on-primary"
+                  onClick={() => {
+                    if (selectedPort) {
+                      const info = selectedPort.getInfo();
+                      const usbVendorId = info.usbVendorId;
+                      const usbProductId = info.usbProductId;
+                      console.log(usbVendorId);
+                      console.log(usbProductId);
+                      navigator.serial
+                        .requestPort({
+                          filters: [{ usbVendorId, usbProductId }],
+                        })
+                        .then((port) => {
+                          setPort(port);
+                          port.open({ baudRate: 9600 });
+                        });
+                    }
+                  }}
+                >
                   Connect
                 </button>
               </div>
@@ -104,6 +148,7 @@ function App(): React.JSX.Element {
               >
                 Screenshot
               </button>
+              <button onClick={() => listPorts()}>Update Ports</button>
             </div>
           </div>
         </div>
