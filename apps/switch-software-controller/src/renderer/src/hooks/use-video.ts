@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
 import fs from 'node:fs';
+import { useCallback, useMemo, useState } from 'react';
 
 export class VideoTrack {
   private settings: MediaTrackSettings;
@@ -19,28 +19,47 @@ export class VideoTrack {
 
 export function useVideo(videoElement: HTMLVideoElement) {
   const video = useMemo<HTMLVideoElement>(() => videoElement, [videoElement]);
-  const [videoInputDevices, setVideoInputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [selectedVideoInputDevice, setSelectedVideoInputDevice] = useState<MediaDeviceInfo | null>(null);
-  const [playingVideoTrack, setPlayingVideoTrack] = useState<VideoTrack | null>(null);
+  const [videoInputDevices, setVideoInputDevices] = useState<MediaDeviceInfo[]>(
+    [],
+  );
+  const [selectedVideoInputDevice, setSelectedVideoInputDevice] =
+    useState<MediaDeviceInfo | null>(null);
+  const [playingVideoTrack, setPlayingVideoTrack] = useState<VideoTrack | null>(
+    null,
+  );
 
-  const selectVideoInputDevice = useCallback((id: string) => {
-    const selected = videoInputDevices.find((device) => device.deviceId === id);
-    if (selected) {
-      setSelectedVideoInputDevice(selected);
-    }
-  }, [videoInputDevices]);
+  const selectVideoInputDevice = useCallback(
+    (id: string) => {
+      const selected = videoInputDevices.find(
+        (device) => device.deviceId === id,
+      );
+      if (selected) {
+        setSelectedVideoInputDevice(selected);
+      }
+    },
+    [videoInputDevices],
+  );
 
   const playVideo = useCallback(() => {
-    if (video && selectedVideoInputDevice) {
-      navigator.mediaDevices.getUserMedia({
-        video: {
-          deviceId: selectedVideoInputDevice.deviceId,
-        }
-      })
+    if (video !== undefined && selectedVideoInputDevice !== null) {
+      navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            deviceId: selectedVideoInputDevice.deviceId,
+          },
+        })
         .then((stream) => {
-          const track = stream.getVideoTracks()[0];
-          setPlayingVideoTrack(new VideoTrack(track));
-          video.srcObject = stream;
+          if (stream) {
+            const track = stream.getVideoTracks()[0];
+            setPlayingVideoTrack(new VideoTrack(track));
+            video.srcObject = stream;
+            video.onloadedmetadata = (_) => video.play();
+          } else {
+            console.log('stream is undefined');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
         });
     }
   }, [selectedVideoInputDevice, video]);
@@ -55,18 +74,31 @@ export function useVideo(videoElement: HTMLVideoElement) {
   }, [playingVideoTrack]);
   const context = useMemo(() => canvas.getContext('2d'), [canvas]);
 
-  const takeScreenshot = useCallback((path: string) => {
-    if (playingVideoTrack && context) {
-      context.drawImage(video, 0, 0, playingVideoTrack.width, playingVideoTrack.height);
-      canvas.toBlob((blob) => {
-        if (blob) {
-          blob.arrayBuffer().then((buffer) => {
-            fs.writeFileSync(path, new Uint8Array(buffer))
-          });
-        }
-      }, 'image/png', 1.0);
-    }
-  }, [context, playingVideoTrack, canvas.toBlob, video]);
+  const takeScreenshot = useCallback(
+    (path: string) => {
+      if (playingVideoTrack && context) {
+        context.drawImage(
+          video,
+          0,
+          0,
+          playingVideoTrack.width,
+          playingVideoTrack.height,
+        );
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              blob.arrayBuffer().then((buffer) => {
+                fs.writeFileSync(path, new Uint8Array(buffer));
+              });
+            }
+          },
+          'image/png',
+          1.0,
+        );
+      }
+    },
+    [context, playingVideoTrack, canvas.toBlob, video],
+  );
 
   return {
     videoInputDevices,

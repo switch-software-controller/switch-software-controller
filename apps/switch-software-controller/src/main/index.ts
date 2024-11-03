@@ -1,9 +1,9 @@
 import path from 'node:path';
+import remote from '@electron/remote/main';
 import { BrowserWindow, app, shell } from 'electron';
 import started from 'electron-squirrel-startup';
-import remote from '@electron/remote/main';
-import { platform } from './platform';
 import icon from '../../resources/icon.png?asset';
+import { platform } from './platform';
 
 remote.initialize();
 

@@ -1,11 +1,11 @@
-import type React from 'react';
-import { useEffect, useCallback, useMemo , useState} from "react";
-import { BsController } from "react-icons/bs";
-import { CiVideoOn } from "react-icons/ci";
-import { FaUsb } from "react-icons/fa";
 import path from 'node:path';
 import { app } from '@electron/remote';
 import { useVideo } from '@renderer/hooks/use-video';
+import type React from 'react';
+import { useEffect } from 'react';
+import { BsController } from 'react-icons/bs';
+import { CiVideoOn } from 'react-icons/ci';
+import { FaUsb } from 'react-icons/fa';
 
 const dataDir = path.join(app.getPath('userData'), 'ssc-data');
 
@@ -15,8 +15,10 @@ async function getVideoInputDevices() {
 }
 
 function App(): React.JSX.Element {
-  const videoElementId = "camera";
-  const videoElement = document.getElementById(videoElementId) as HTMLVideoElement;
+  const videoElementId = 'camera';
+  const videoElement = document.getElementById(
+    videoElementId,
+  ) as HTMLVideoElement;
 
   const {
     videoInputDevices,
@@ -30,7 +32,7 @@ function App(): React.JSX.Element {
     getVideoInputDevices().then((devices) => {
       setVideoInputDevices(devices);
     });
-  }, [setVideoInputDevices])
+  }, [setVideoInputDevices]);
 
   useEffect(() => {
     if (videoInputDevices.length > 0) {
@@ -42,17 +44,29 @@ function App(): React.JSX.Element {
     <div className="h-dvh bg-surface">
       <div className="flex h-dvh">
         <div className="flex flex-1 flex-col text-on-surface">
-          <video id={videoElementId} autoPlay className="w-full p-2" />
+          <video id={videoElementId} className="w-full p-2" autoPlay />
           <div className="flex h-full w-full">
             <div className="flex flex-1 flex-col gap-4 p-2">
               <div className="flex gap-2">
                 <CiVideoOn />
-                <select className="flex-1 bg-surface-dim" onChange={(event) => selectVideoInputDevice(event.target.value)}>
+                <select
+                  className="flex-1 bg-surface-dim"
+                  onChange={(event) =>
+                    selectVideoInputDevice(event.target.value)
+                  }
+                >
                   {videoInputDevices.map((device) => {
-                    return <option key={device.deviceId} value={device.deviceId}>{device.label}</option>;
+                    return (
+                      <option key={device.deviceId} value={device.deviceId}>
+                        {device.label}
+                      </option>
+                    );
                   })}
                 </select>
-                <button className="rounded-md bg-primary px-2 text-on-primary" onClick={playVideo}>
+                <button
+                  className="rounded-md bg-primary px-2 text-on-primary"
+                  onClick={playVideo}
+                >
                   Connect
                 </button>
               </div>
@@ -81,7 +95,15 @@ function App(): React.JSX.Element {
             </div>
             <div className="flex flex-1 p-2">
               Macro
-              <button onClick={() => takeScreenshot(path.join(dataDir, 'captures', 'screenshot.png'))}>Screenshot</button>
+              <button
+                onClick={() =>
+                  takeScreenshot(
+                    path.join(dataDir, 'captures', 'screenshot.png'),
+                  )
+                }
+              >
+                Screenshot
+              </button>
             </div>
           </div>
         </div>

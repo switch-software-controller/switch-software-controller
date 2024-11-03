@@ -11,6 +11,10 @@ const config: ForgeConfig = {
   packagerConfig: {
     name: 'Switch Software Controller',
     asar: true,
+    extendInfo: {
+      NSCameraUsageDescription: 'This app requires access to your camera to capture game screen.',
+      NSMicrophoneUsageDescription: 'This app requires access to your microphone to capture game screen.',
+    },
   },
   rebuildConfig: {},
   makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],

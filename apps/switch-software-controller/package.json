@@ -9,7 +9,9 @@
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
+    "sign": "codesign --force --deep --sign - out/Switch\\ Software\\ Controller-darwin-arm64/Switch\\ Software\\ Controller.app",
     "package": "electron-forge package",
+    "package:mac": "electron-forge package && npm run sign",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "format": "biome format --write ./src",
