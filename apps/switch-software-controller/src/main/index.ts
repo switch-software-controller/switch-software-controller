@@ -38,34 +38,46 @@ const createWindow = () => {
     return { action: 'deny' };
   });
 
-  mainWindow.webContents.session.on('select-serial-port', (event, portList, webContents, callback) => {
-    mainWindow.webContents.session.on('serial-port-added', (event, port) => {
-      console.log('serial-port-added FIRED WITH', port);
-    });
+  mainWindow.webContents.session.on(
+    'select-serial-port',
+    (event, portList, webContents, callback) => {
+      mainWindow.webContents.session.on('serial-port-added', (event, port) => {
+        console.log('serial-port-added FIRED WITH', port);
+      });
 
-    mainWindow.webContents.session.on('serial-port-removed', (event, port) => {
-      console.log('serial-port-removed FIRED WITH', port);
-    });
+      mainWindow.webContents.session.on(
+        'serial-port-removed',
+        (event, port) => {
+          console.log('serial-port-removed FIRED WITH', port);
+        },
+      );
 
-    event.preventDefault()
-    if (portList && portList.length > 0) {
-      callback(portList[0].portId);
-    } else {
-      callback('');
-    }
-  });
+      event.preventDefault();
+      if (portList && portList.length > 0) {
+        callback(portList[0].portId);
+      } else {
+        callback('');
+      }
+    },
+  );
 
-  mainWindow.webContents.session.on('select-usb-device', (event, details, callback) => {
-    mainWindow.webContents.session.on('usb-device-added', (event, device) => {
-      console.log('usb-device-added FIRED WITH', device);
-    })
+  mainWindow.webContents.session.on(
+    'select-usb-device',
+    (event, details, callback) => {
+      mainWindow.webContents.session.on('usb-device-added', (event, device) => {
+        console.log('usb-device-added FIRED WITH', device);
+      });
 
-    mainWindow.webContents.session.on('usb-device-removed', (event, device) => {
-      console.log('usb-device-removed FIRED WITH', device);
-    })
+      mainWindow.webContents.session.on(
+        'usb-device-removed',
+        (event, device) => {
+          console.log('usb-device-removed FIRED WITH', device);
+        },
+      );
 
-    event.preventDefault();
-  });
+      event.preventDefault();
+    },
+  );
 
   // permission handlers
   mainWindow.webContents.session.setPermissionCheckHandler(() => true);
