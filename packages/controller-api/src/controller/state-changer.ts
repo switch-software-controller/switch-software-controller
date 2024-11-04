@@ -1,4 +1,4 @@
-import type { ControllerState } from "../state";
+import type { ControllerState } from '../state';
 
 /**
  * A function that change the controller state.

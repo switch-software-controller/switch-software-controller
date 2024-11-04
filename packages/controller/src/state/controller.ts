@@ -3,7 +3,7 @@ import type {
   ControllerState,
   HatState,
   StickState,
-} from "@switch-software-controller/controller-api";
+} from '@switch-software-controller/controller-api';
 
 export class ControllerStateImpl implements ControllerState {
   /**

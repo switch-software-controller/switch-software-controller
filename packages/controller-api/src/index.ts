@@ -3,14 +3,14 @@ export {
   Hat,
   type StickTilt,
   StickTiltPreset,
-} from "./primitives";
+} from './primitives';
 export type {
   ButtonState,
   HatState,
   StickState,
   ControllerState,
-} from "./state";
+} from './state';
 export type {
   Controller,
   StateChanger,
-} from "./controller";
+} from './controller';

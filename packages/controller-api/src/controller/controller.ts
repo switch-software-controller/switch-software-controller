@@ -1,4 +1,4 @@
-import type { StateChanger } from "./state-changer.ts";
+import type { StateChanger } from './state-changer.ts';
 
 /**
  * The controller that can send input to the device.

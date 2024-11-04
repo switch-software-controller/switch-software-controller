@@ -1,5 +1,5 @@
-import { Hat, type HatState } from "@switch-software-controller/controller-api";
-import { HatValue } from "../primitives";
+import { Hat, type HatState } from '@switch-software-controller/controller-api';
+import { HatValue } from '../primitives';
 
 /**
  * Default Implementation of HatState

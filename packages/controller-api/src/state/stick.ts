@@ -1,4 +1,4 @@
-import type { StickTilt, StickTiltPreset } from "../primitives";
+import type { StickTilt, StickTiltPreset } from '../primitives';
 
 /**
  * Represents the state of a stick.

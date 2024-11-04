@@ -2,8 +2,8 @@ import type {
   StickState,
   StickTilt,
   StickTiltPreset,
-} from "@switch-software-controller/controller-api";
-import { StickTiltPresetDefault, StickTiltRange } from "../primitives";
+} from '@switch-software-controller/controller-api';
+import { StickTiltPresetDefault, StickTiltRange } from '../primitives';
 
 /**
  * Default Implementation of StickState

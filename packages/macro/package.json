@@ -1,8 +1,7 @@
 {
-  "name": "@switch-software-controller/command",
+  "name": "@switch-software-controller/macro",
   "version": "0.1.0",
-  "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
@@ -21,6 +20,7 @@
   "devDependencies": {
     "@switch-software-controller/controller-api": "*",
     "@switch-software-controller/logger-api": "*",
+    "@switch-software-controller/macro-api": "*",
     "@switch-software-controller/timer-api": "*"
   }
 }

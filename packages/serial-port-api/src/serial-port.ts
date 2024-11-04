@@ -1,4 +1,4 @@
-import type { SerialPortInfo } from "./info.ts";
+import type { SerialPortInfo } from './info.ts';
 
 export interface SerialPort {
   /**
