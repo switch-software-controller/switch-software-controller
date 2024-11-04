@@ -1,11 +1,13 @@
-import type { SerialPortInfo } from './info.ts';
+export type SerialPortOpenOptions = {
+  baudRate: number;
+};
 
 export interface SerialPort {
   /**
    * Opens the serial port.
-   * @param info The information of the serial port.
+   * @param options The options for open the serial port.
    */
-  open(info: SerialPortInfo): void;
+  open(options: SerialPortOpenOptions): void;
 
   /**
    * Closes the serial port.
