@@ -51,6 +51,12 @@ function App(): React.JSX.Element {
     });
   }, []);
 
+  const listUsbDevices = useCallback(() => {
+    navigator.usb.getDevices().then((devices) => {
+      console.log(devices);
+    });
+  }, []);
+
   return (
     <div className="h-dvh bg-surface">
       <div className="flex h-dvh">
@@ -149,10 +155,12 @@ function App(): React.JSX.Element {
                 Screenshot
               </button>
               <button onClick={() => listPorts()}>Update Ports</button>
+              <button onClick={() => listUsbDevices()}>Update USB</button>
             </div>
           </div>
         </div>
-        <div className="flex h-full w-80 flex-col overflow-y-scroll border border-on-surface bg-surface-bright p-2 text-on-surface">
+        <div
+          className="flex h-full w-80 flex-col overflow-y-scroll border border-on-surface bg-surface-bright p-2 text-on-surface">
           Timeline
         </div>
       </div>

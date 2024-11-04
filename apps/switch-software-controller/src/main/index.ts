@@ -55,9 +55,26 @@ const createWindow = () => {
     }
   });
 
+  mainWindow.webContents.session.on('select-usb-device', (event, details, callback) => {
+    mainWindow.webContents.session.on('usb-device-added', (event, device) => {
+      console.log('usb-device-added FIRED WITH', device);
+    })
+
+    mainWindow.webContents.session.on('usb-device-removed', (event, device) => {
+      console.log('usb-device-removed FIRED WITH', device);
+    })
+
+    event.preventDefault();
+  });
+
   // permission handlers
   mainWindow.webContents.session.setPermissionCheckHandler(() => true);
   mainWindow.webContents.session.setDevicePermissionHandler(() => true);
+  mainWindow.webContents.session.setUSBProtectedClassesHandler((details) => {
+    return details.protectedClasses.filter((usbClass) => {
+      return usbClass.indexOf('audio') === -1;
+    });
+  });
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
