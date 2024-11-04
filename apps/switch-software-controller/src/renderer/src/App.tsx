@@ -1,8 +1,11 @@
 import path from 'node:path';
 import { app } from '@electron/remote';
+import { useController } from '@renderer/hooks/use-controller';
+import { useGamepad } from '@renderer/hooks/use-gamepad';
+import { useUsb } from '@renderer/hooks/use-usb';
 import { useVideo } from '@renderer/hooks/use-video';
 import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BsController } from 'react-icons/bs';
 import { CiVideoOn } from 'react-icons/ci';
 import { FaUsb } from 'react-icons/fa';
@@ -19,11 +22,6 @@ function App(): React.JSX.Element {
   const videoElement = document.getElementById(
     videoElementId,
   ) as HTMLVideoElement;
-  const [serialPorts, setSerialPorts] = useState<SerialPort[]>([]);
-  const [selectedPort, setSelectedPort] = useState<SerialPort | null>(
-    null,
-  );
-  const [port, setPort] = useState<SerialPort>(null);
 
   const {
     videoInputDevices,
@@ -32,6 +30,19 @@ function App(): React.JSX.Element {
     playVideo,
     takeScreenshot,
   } = useVideo(videoElement);
+
+  const {
+    usbDevices,
+    updateUsbDevices,
+    selectUsbDevice,
+    connectUsbDevice,
+    connectedUsbDevice,
+  } = useUsb();
+
+  const { controller } = useController(connectedUsbDevice);
+
+  const { gamepads, updateGamepads, selectGamepad, startGamepad } =
+    useGamepad(controller);
 
   useEffect(() => {
     getVideoInputDevices().then((devices) => {
@@ -45,17 +56,9 @@ function App(): React.JSX.Element {
     }
   }, [videoInputDevices, selectVideoInputDevice]);
 
-  const listPorts = useCallback(() => {
-    navigator.serial.getPorts().then((ports) => {
-      setSerialPorts(ports.filter((port) => port.connected));
-    });
-  }, []);
-
-  const listUsbDevices = useCallback(() => {
-    navigator.usb.getDevices().then((devices) => {
-      console.log(devices);
-    });
-  }, []);
+  useEffect(() => {
+    updateUsbDevices();
+  }, [updateUsbDevices]);
 
   return (
     <div className="h-dvh bg-surface">
@@ -87,59 +90,70 @@ function App(): React.JSX.Element {
                   Connect
                 </button>
               </div>
-              <div className="flex gap-2">
-                <FaUsb />
-                <select
-                  className="flex-1 bg-surface-dim"
-                  onChange={(e) => {
-                    setSelectedPort(
-                      serialPorts.find((port) => {
-                        const info = port.getInfo();
-                        return `0x${info.usbVendorId.toString(16).padStart(4, '0')} | 0x${info.usbProductId.toString(16).padStart(4, '0')}` === e.target.value;
-                      }),
-                    );
-                  }}
-                >
-                  {serialPorts.map((port) => {
-                    const info = port.getInfo();
-                    const s = `0x${info.usbVendorId.toString(16).padStart(4, '0')} | 0x${info.usbProductId.toString(16).padStart(4, '0')}`;
-                    return (
-                      <option key={s} value={s}>{s}</option>
-                    );
-                  })}
-                </select>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <FaUsb />
+                  <select
+                    className="flex-1 bg-surface-dim"
+                    onChange={(e) => {
+                      selectUsbDevice(e.target.value);
+                    }}
+                  >
+                    {usbDevices.map((device) => {
+                      return (
+                        <option
+                          key={device.serialNumber}
+                          value={device.serialNumber}
+                        >
+                          {device.productName}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <button
+                    className="rounded-md bg-primary px-2 text-on-primary"
+                    onClick={() => {
+                      connectUsbDevice({ baudRate: 9600 });
+                    }}
+                  >
+                    Connect
+                  </button>
+                </div>
                 <button
-                  className="rounded-md bg-primary px-2 text-on-primary"
-                  onClick={() => {
-                    if (selectedPort) {
-                      const info = selectedPort.getInfo();
-                      const usbVendorId = info.usbVendorId;
-                      const usbProductId = info.usbProductId;
-                      console.log(usbVendorId);
-                      console.log(usbProductId);
-                      navigator.serial
-                        .requestPort({
-                          filters: [{ usbVendorId, usbProductId }],
-                        })
-                        .then((port) => {
-                          setPort(port);
-                          port.open({ baudRate: 9600 });
-                        });
-                    }
-                  }}
+                  className="rounded-md bg-primary px-2 text-on-primary flex-1"
+                  onClick={updateUsbDevices}
                 >
-                  Connect
+                  Update USB Devices
                 </button>
               </div>
-              <div className="flex gap-2">
-                <BsController />
-                <select className="flex-1 bg-surface-dim">
-                  <option>Controller1</option>
-                  <option>Controller2</option>
-                  <option>Controller3</option>
-                </select>
-                <button className="rounded-md bg-primary px-2 text-on-primary">
-                  Connect
+              <div className="flex flex-col">
+                <div className="flex gap-2">
+                  <BsController />
+                  <select
+                    className="flex-1 bg-surface-dim"
+                    onChange={(e) => selectGamepad(e.target.value)}
+                  >
+                    {gamepads
+                      .map((gamepad) => {
+                        return (
+                          <option key={gamepad.id} value={gamepad.id}>
+                            {gamepad.id}
+                          </option>
+                        );
+                      })}
+                  </select>
+                  <button
+                    className="rounded-md bg-primary px-2 text-on-primary"
+                    onClick={startGamepad}
+                  >
+                    Connect
+                  </button>
+                </div>
+                <button
+                  className="rounded-md bg-primary px-2 text-on-primary flex-1"
+                  onClick={updateGamepads}
+                >
+                  Update Gamepads
                 </button>
               </div>
             </div>
@@ -154,13 +168,10 @@ function App(): React.JSX.Element {
               >
                 Screenshot
               </button>
-              <button onClick={() => listPorts()}>Update Ports</button>
-              <button onClick={() => listUsbDevices()}>Update USB</button>
             </div>
           </div>
         </div>
-        <div
-          className="flex h-full w-80 flex-col overflow-y-scroll border border-on-surface bg-surface-bright p-2 text-on-surface">
+        <div className="flex h-full w-80 flex-col overflow-y-scroll border border-on-surface bg-surface-bright p-2 text-on-surface">
           Timeline
         </div>
       </div>
