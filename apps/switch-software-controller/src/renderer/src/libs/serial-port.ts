@@ -18,6 +18,13 @@ export class SerialPortImpl implements Base {
   }
 
   close(): void {
+    try {
+      if (this._writer) {
+        this.writer.releaseLock();
+      }
+    } catch (e) {
+      console.log(e);
+    }
     this.port.close().catch((err) => console.log(err));
   }
 
