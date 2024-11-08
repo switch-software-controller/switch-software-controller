@@ -32,7 +32,7 @@ export function useUsb() {
       if (selectedUsbDevice) {
         navigator.serial.requestPort().then((port) => {
           if (port) {
-            const serialPort = new SerialPortImpl(port);
+            const serialPort = new SerialPortImpl(port, new TextEncoder());
             setConnectedUsbDevice(serialPort);
             serialPort.open(options);
           }

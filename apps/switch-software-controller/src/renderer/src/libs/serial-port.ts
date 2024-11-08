@@ -1,16 +1,27 @@
 import type { SerialPort as Base, SerialPortOpenOptions, } from '@switch-software-controller/serial-port-api';
 
-export class SerialPortImpl implements Base {
-  private readonly encoder = new TextEncoder();
-  private _writer: WritableStreamDefaultWriter<Uint8Array> | null = null;
+export interface Encoder {
+  encode(data: string): Uint8Array;
+}
 
-  constructor(private readonly port: SerialPort) {}
+export class SerialPortImpl implements Base {
+  private writer_: WritableStreamDefaultWriter<Uint8Array> | null = null;
+  private readonly port: SerialPort;
+  private readonly encoder: Encoder;
+
+  constructor(
+    port: SerialPort,
+    encoder: Encoder,
+  ) {
+    this.port = port;
+    this.encoder = encoder;
+  }
 
   private get writer(): WritableStreamDefaultWriter<Uint8Array> {
-    if (!this._writer) {
-      this._writer = this.port.writable.getWriter();
+    if (!this.writer_) {
+      this.writer_ = this.port.writable.getWriter();
     }
-    return this._writer;
+    return this.writer_;
   }
 
   open(options: SerialPortOpenOptions): void {
@@ -19,7 +30,7 @@ export class SerialPortImpl implements Base {
 
   close(): void {
     try {
-      if (this._writer) {
+      if (this.writer_) {
         this.writer.releaseLock();
       }
     } catch (e) {
