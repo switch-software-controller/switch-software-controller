@@ -1,4 +1,7 @@
-import type { SerialPort as Base, SerialPortOpenOptions, } from '@switch-software-controller/serial-port-api';
+import type {
+  SerialPort as Base,
+  SerialPortOpenOptions,
+} from '@switch-software-controller/serial-port-api';
 
 export interface Encoder {
   encode(data: string): Uint8Array;
@@ -9,10 +12,7 @@ export class SerialPortImpl implements Base {
   private readonly port: SerialPort;
   private readonly encoder: Encoder;
 
-  constructor(
-    port: SerialPort,
-    encoder: Encoder,
-  ) {
+  constructor(port: SerialPort, encoder: Encoder) {
     this.port = port;
     this.encoder = encoder;
   }

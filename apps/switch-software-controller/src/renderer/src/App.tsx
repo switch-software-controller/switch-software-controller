@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { app } from '@electron/remote';
 import { useController } from '@renderer/hooks/use-controller';
-import { useGamepad } from '@renderer/hooks/use-gamepad';
+import { useGamepad, useGamepads } from '@renderer/hooks/use-gamepad';
 import { useUsb } from '@renderer/hooks/use-usb';
 import { useVideo } from '@renderer/hooks/use-video';
 import type React from 'react';
@@ -41,8 +41,9 @@ function App(): React.JSX.Element {
 
   const { controller } = useController(connectedUsbDevice);
 
-  const { gamepads, updateGamepads, selectGamepad, startGamepad } =
-    useGamepad(controller);
+  const { gamepads, updateGamepads, selectGamepad, selectedGamepad } =
+    useGamepads();
+  const { startUpdateGamepad } = useGamepad(controller, selectedGamepad?.id);
 
   useEffect(() => {
     getVideoInputDevices().then((devices) => {
@@ -133,18 +134,17 @@ function App(): React.JSX.Element {
                     className="flex-1 bg-surface-dim"
                     onChange={(e) => selectGamepad(e.target.value)}
                   >
-                    {gamepads
-                      .map((gamepad) => {
-                        return (
-                          <option key={gamepad.id} value={gamepad.id}>
-                            {gamepad.id}
-                          </option>
-                        );
-                      })}
+                    {gamepads.map((gamepad) => {
+                      return (
+                        <option key={gamepad.id} value={gamepad.id}>
+                          {gamepad.id}
+                        </option>
+                      );
+                    })}
                   </select>
                   <button
                     className="rounded-md bg-primary px-2 text-on-primary"
-                    onClick={startGamepad}
+                    onClick={startUpdateGamepad}
                   >
                     Connect
                   </button>

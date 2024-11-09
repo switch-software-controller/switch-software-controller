@@ -1,4 +1,7 @@
-import type { SerialPort, SerialPortOpenOptions, } from '@switch-software-controller/serial-port-api';
+import type {
+  SerialPort,
+  SerialPortOpenOptions,
+} from '@switch-software-controller/serial-port-api';
 import { useCallback, useState } from 'react';
 import { SerialPortImpl } from '../libs/serial-port';
 
