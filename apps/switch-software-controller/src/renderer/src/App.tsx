@@ -58,7 +58,9 @@ function App(): React.JSX.Element {
   }, [videoInputDevices, selectVideoInputDevice]);
 
   useEffect(() => {
-    updateUsbDevices();
+    updateUsbDevices().catch((err) => {
+      console.error(`[Error] update usb devices: ${err}`);
+    });
   }, [updateUsbDevices]);
 
   return (
@@ -96,8 +98,9 @@ function App(): React.JSX.Element {
                   <FaUsb />
                   <select
                     className="flex-1 bg-surface-dim"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       selectUsbDevice(e.target.value);
+                      await connectUsbDevice({ baudRate: 9600 });
                     }}
                   >
                     {usbDevices.map((device) => {
@@ -111,14 +114,6 @@ function App(): React.JSX.Element {
                       );
                     })}
                   </select>
-                  <button
-                    className="rounded-md bg-primary px-2 text-on-primary"
-                    onClick={() => {
-                      connectUsbDevice({ baudRate: 9600 });
-                    }}
-                  >
-                    Connect
-                  </button>
                 </div>
                 <button
                   className="rounded-md bg-primary px-2 text-on-primary flex-1"
@@ -127,7 +122,7 @@ function App(): React.JSX.Element {
                   Update USB Devices
                 </button>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <BsController />
                   <select

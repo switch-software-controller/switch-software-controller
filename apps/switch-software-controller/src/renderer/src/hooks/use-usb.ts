@@ -13,17 +13,23 @@ export function useUsb() {
   const [connectedUsbDevice, setConnectedUsbDevice] =
     useState<SerialPort | null>(null);
 
-  const updateUsbDevices = useCallback(() => {
-    navigator.usb.getDevices().then((devices) => {
+  const updateUsbDevices = useCallback(async () => {
+    try {
+      const devices = await navigator.usb.getDevices();
       setUsbDevices(devices);
-    });
+      if (devices.length > 0) {
+        setSelectedUsbDevice(devices[0]);
+      }
+    } catch (err) {
+      console.error(`[Error] update usb devices: ${err}`);
+    }
   }, []);
 
   const selectUsbDevice = useCallback(
     (id: string) => {
       const selected = usbDevices.find((device) => device.serialNumber === id);
       if (selected) {
-        console.log(`selectedUsbDevice: ${selected.productName}`);
+        console.debug(`[Debug] selected usb device: ${selected.productName}`);
         setSelectedUsbDevice(selected);
       }
     },
@@ -31,15 +37,18 @@ export function useUsb() {
   );
 
   const connectUsbDevice = useCallback(
-    (options: SerialPortOpenOptions) => {
+    async (options: SerialPortOpenOptions) => {
       if (selectedUsbDevice) {
-        navigator.serial.requestPort().then((port) => {
+        try {
+          const port = await navigator.serial.requestPort();
           if (port) {
             const serialPort = new SerialPortImpl(port, new TextEncoder());
             setConnectedUsbDevice(serialPort);
-            serialPort.open(options);
+            await serialPort.open(options);
           }
-        });
+        } catch (err) {
+          console.error(`[Error] connect usb device: ${err}`);
+        }
       }
     },
     [selectedUsbDevice],

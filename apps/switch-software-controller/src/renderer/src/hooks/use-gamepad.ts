@@ -10,15 +10,20 @@ export function useGamepad(controller: Controller, gamepadId: string) {
 
   const gamepadFrame = useCallback(
     (timestamp: DOMHighResTimeStamp) => {
+      console.log(`[Debug] gamepad frame: ${timestamp}, ${lastChanged}, ${id}`);
       const gamepad = navigator
         .getGamepads()
         .filter((gamepad) => gamepad !== null && gamepad !== undefined)
         .find((gamepad) => gamepad.id === id);
-      if (gamepad && gamepad.timestamp > lastChanged) {
-        setLastChanged(gamepad.timestamp);
-        controller_.send(stateChangerByGamepad(gamepad));
-      }
-      requestAnimationFrame(gamepadFrame);
+      // if (gamepad && gamepad.timestamp > lastChanged) {
+      //   setLastChanged(gamepad.timestamp);
+      //   controller_.send(stateChangerByGamepad(gamepad));
+      // }
+      controller_.send(stateChangerByGamepad(gamepad))
+        .then(() => {
+          setRequestId(requestAnimationFrame(gamepadFrame));
+        })
+        .catch((err) => console.error(`[Error] send: ${err}`));
     },
     [controller_, id, lastChanged],
   );

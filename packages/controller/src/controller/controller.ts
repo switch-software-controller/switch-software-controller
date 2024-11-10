@@ -20,11 +20,13 @@ export class ControllerImpl implements Controller {
     private readonly port: SerialPort,
   ) {}
 
-  send(stateChanger?: StateChanger): void {
+  async send(stateChanger?: StateChanger): Promise<void> {
     stateChanger?.(this.state);
     const serialized = this.serialize(this.state);
     this.state.consumeSticks();
-    this.port.writeLine(serialized);
+    console.log(`[Debug] sending: ${serialized}`);
+    await this.port.writeLine(serialized);
+    console.log(`[Debug] sent: ${serialized}`);
   }
 
   /**

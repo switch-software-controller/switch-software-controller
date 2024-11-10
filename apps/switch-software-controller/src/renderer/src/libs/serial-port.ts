@@ -24,31 +24,35 @@ export class SerialPortImpl implements Base {
     return this.writer_;
   }
 
-  open(options: SerialPortOpenOptions): void {
-    this.port.open(options).catch((err) => console.log(err));
-  }
-
-  close(): void {
+  async open(options: SerialPortOpenOptions): Promise<void> {
     try {
-      if (this.writer_) {
-        this.writer.releaseLock();
-      }
-    } catch (e) {
-      console.log(e);
+      await this.port.open(options)
+    } catch (err) {
+      console.log(`[Error] open: ${err}`);
     }
-    this.port.close().catch((err) => console.log(err));
   }
 
-  write(data: string): void {
-    const encoded = this.encoder.encode(data);
-    // const hex = Array.from(encoded).map((n) => `0x${n.toString(16).padStart(2, '0')}`).join(' ');
-    this.writer
-      .write(encoded)
-      .then(() => {})
-      .catch((err) => console.log(err));
+  async close(): Promise<void> {
+    try {
+      await this.port.close();
+    } catch (err) {
+      console.log(`[Error] close: ${err}`);
+    }
   }
 
-  writeLine(data: string): void {
-    this.write(`${data}\r\n`);
+  async write(data: string): Promise<void> {
+    console.debug(`[Debug] write: ${data}`);
+    try {
+      const encoded = this.encoder.encode(data);
+      await this.writer.write(encoded);
+      const hex = Array.from(encoded).map((n) => `0x${n.toString(16).padStart(2, '0')}`).join(' ');
+      console.debug(`[Debug] write: ${hex}`);
+    } catch (err) {
+      console.error(`[Error] write: ${err}`);
+    }
+  }
+
+  async writeLine(data: string): Promise<void> {
+    await this.write(`${data}\r\n`);
   }
 }
