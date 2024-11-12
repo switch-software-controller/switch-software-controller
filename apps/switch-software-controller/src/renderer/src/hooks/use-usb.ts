@@ -15,10 +15,20 @@ export function useUsb() {
 
   const updateUsbDevices = useCallback(async () => {
     try {
-      const devices = await navigator.usb.getDevices();
-      setUsbDevices(devices);
-      if (devices.length > 0) {
-        setSelectedUsbDevice(devices[0]);
+      const targets: USBDevice[] = [];
+      const usbDevices = await navigator.usb.getDevices();
+      for (const serial of await navigator.serial.getPorts()) {
+        const serialInfo = serial.getInfo();
+        const target = usbDevices.find((device) => device.vendorId === serialInfo.usbVendorId && device.productId === serialInfo.usbProductId);
+        if (target !== undefined) {
+          targets.push(target);
+        }
+      }
+      setUsbDevices(targets);
+      if (targets.length > 0) {
+        setSelectedUsbDevice(targets[0]);
+      } else {
+        setSelectedUsbDevice(null)
       }
     } catch (err) {
       console.error(`[Error] update usb devices: ${err}`);
