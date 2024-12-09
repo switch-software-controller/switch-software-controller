@@ -5,27 +5,22 @@ import { useCallback, useMemo, useState } from 'react';
 export function useGamepad(controller: Controller, gamepadId: string) {
   const controller_ = useMemo(() => controller, [controller]);
   const id = useMemo(() => gamepadId, [gamepadId]);
-  const [lastChanged, setLastChanged] = useState<number>(0);
   const [requestId, setRequestId] = useState<number>(null);
 
   const gamepadFrame = useCallback(
     (timestamp: DOMHighResTimeStamp) => {
-      console.log(`[Debug] gamepad frame: ${timestamp}, ${lastChanged}, ${id}`);
+      console.log(`[Debug] gamepad frame: ${timestamp}, ${id}`);
       const gamepad = navigator
         .getGamepads()
         .filter((gamepad) => gamepad !== null && gamepad !== undefined)
         .find((gamepad) => gamepad.id === id);
-      // if (gamepad && gamepad.timestamp > lastChanged) {
-      //   setLastChanged(gamepad.timestamp);
-      //   controller_.send(stateChangerByGamepad(gamepad));
-      // }
       controller_.send(stateChangerByGamepad(gamepad))
         .then(() => {
           setRequestId(requestAnimationFrame(gamepadFrame));
         })
         .catch((err) => console.error(`[Error] send: ${err}`));
     },
-    [controller_, id, lastChanged],
+    [controller_, id],
   );
 
   const start = useCallback(() => {
