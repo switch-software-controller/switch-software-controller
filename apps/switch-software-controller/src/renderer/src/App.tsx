@@ -116,7 +116,7 @@ function App(): React.JSX.Element {
                   </select>
                 </div>
                 <button
-                  className="rounded-md bg-primary px-2 text-on-primary flex-1"
+                  className='flex-1 rounded-md bg-primary px-2 text-on-primary'
                   onClick={updateUsbDevices}
                 >
                   Update USB Devices
@@ -145,7 +145,7 @@ function App(): React.JSX.Element {
                   </button>
                 </div>
                 <button
-                  className="rounded-md bg-primary px-2 text-on-primary flex-1"
+                  className='flex-1 rounded-md bg-primary px-2 text-on-primary'
                   onClick={updateGamepads}
                 >
                   Update Gamepads
