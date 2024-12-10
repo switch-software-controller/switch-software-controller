@@ -24,6 +24,7 @@ const createWindow = () => {
       sandbox: false,
       nodeIntegration: true,
       contextIsolation: false,
+      experimentalFeatures: true,
     },
   });
   remote.enable(mainWindow.webContents);
@@ -35,6 +36,33 @@ const createWindow = () => {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
     return { action: 'deny' };
+  });
+
+  mainWindow.webContents.session.on('select-serial-port', (event, portList, webContents, callback) => {
+    event.preventDefault();
+    if (portList && portList.length > 0) {
+      callback(portList[0].portId);
+    } else {
+      callback('');
+    }
+  });
+  mainWindow.webContents.session.on('select-usb-device', (event, details, callback) => {
+    event.preventDefault();
+    const deviceList = details.deviceList;
+    if (deviceList && deviceList.length > 0) {
+      callback(deviceList[0].deviceId);
+    } else {
+      callback();
+    }
+  });
+
+  // permission handlers
+  mainWindow.webContents.session.setPermissionCheckHandler(() => true);
+  mainWindow.webContents.session.setDevicePermissionHandler(() => true);
+  mainWindow.webContents.session.setUSBProtectedClassesHandler((details) => {
+    return details.protectedClasses.filter((usbClass) => {
+      return usbClass.indexOf('audio') === -1;
+    });
   });
 
   // and load the index.html of the app.

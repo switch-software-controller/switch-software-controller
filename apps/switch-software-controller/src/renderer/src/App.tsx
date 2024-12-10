@@ -1,5 +1,8 @@
 import path from 'node:path';
 import { app } from '@electron/remote';
+import { useController } from '@renderer/hooks/use-controller';
+import { useGamepad, useGamepads } from '@renderer/hooks/use-gamepad';
+import { useUsb } from '@renderer/hooks/use-usb';
 import { useVideo } from '@renderer/hooks/use-video';
 import type React from 'react';
 import { useEffect } from 'react';
@@ -28,6 +31,20 @@ function App(): React.JSX.Element {
     takeScreenshot,
   } = useVideo(videoElement);
 
+  const {
+    usbDevices,
+    updateUsbDevices,
+    selectUsbDevice,
+    connectUsbDevice,
+    connectedUsbDevice,
+  } = useUsb();
+
+  const { controller } = useController(connectedUsbDevice);
+
+  const { gamepads, updateGamepads, selectGamepad, selectedGamepad } =
+    useGamepads();
+  const { startUpdateGamepad } = useGamepad(controller, selectedGamepad?.id);
+
   useEffect(() => {
     getVideoInputDevices().then((devices) => {
       setVideoInputDevices(devices);
@@ -39,6 +56,12 @@ function App(): React.JSX.Element {
       selectVideoInputDevice(videoInputDevices[0].deviceId);
     }
   }, [videoInputDevices, selectVideoInputDevice]);
+
+  useEffect(() => {
+    updateUsbDevices().catch((err) => {
+      console.error(`[Error] update usb devices: ${err}`);
+    });
+  }, [updateUsbDevices]);
 
   return (
     <div className="h-dvh bg-surface">
@@ -70,26 +93,62 @@ function App(): React.JSX.Element {
                   Connect
                 </button>
               </div>
-              <div className="flex gap-2">
-                <FaUsb />
-                <select className="flex-1 bg-surface-dim">
-                  <option>USB1</option>
-                  <option>USB2</option>
-                  <option>USB3</option>
-                </select>
-                <button className="rounded-md bg-primary px-2 text-on-primary">
-                  Connect
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <FaUsb />
+                  <select
+                    className="flex-1 bg-surface-dim"
+                    onChange={async (e) => {
+                      selectUsbDevice(e.target.value);
+                      await connectUsbDevice({ baudRate: 9600 });
+                    }}
+                  >
+                    {usbDevices.map((device) => {
+                      return (
+                        <option
+                          key={device.serialNumber}
+                          value={device.serialNumber}
+                        >
+                          {device.productName}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <button
+                  className='flex-1 rounded-md bg-primary px-2 text-on-primary'
+                  onClick={updateUsbDevices}
+                >
+                  Update USB Devices
                 </button>
               </div>
-              <div className="flex gap-2">
-                <BsController />
-                <select className="flex-1 bg-surface-dim">
-                  <option>Controller1</option>
-                  <option>Controller2</option>
-                  <option>Controller3</option>
-                </select>
-                <button className="rounded-md bg-primary px-2 text-on-primary">
-                  Connect
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <BsController />
+                  <select
+                    className="flex-1 bg-surface-dim"
+                    onChange={(e) => selectGamepad(e.target.value)}
+                  >
+                    {gamepads.map((gamepad) => {
+                      return (
+                        <option key={gamepad.id} value={gamepad.id}>
+                          {gamepad.id}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <button
+                    className="rounded-md bg-primary px-2 text-on-primary"
+                    onClick={startUpdateGamepad}
+                  >
+                    Connect
+                  </button>
+                </div>
+                <button
+                  className='flex-1 rounded-md bg-primary px-2 text-on-primary'
+                  onClick={updateGamepads}
+                >
+                  Update Gamepads
                 </button>
               </div>
             </div>

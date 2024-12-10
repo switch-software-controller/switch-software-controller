@@ -1,2 +1,1 @@
-export type { SerialPortInfo } from './info.ts';
-export type { SerialPort } from './serial-port.ts';
+export type { SerialPort, SerialPortOpenOptions } from './serial-port.ts';
