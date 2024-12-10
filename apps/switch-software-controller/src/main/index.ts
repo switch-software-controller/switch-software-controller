@@ -59,11 +59,7 @@ const createWindow = () => {
   // permission handlers
   mainWindow.webContents.session.setPermissionCheckHandler(() => true);
   mainWindow.webContents.session.setDevicePermissionHandler(() => true);
-  mainWindow.webContents.session.setUSBProtectedClassesHandler((details) => {
-    return details.protectedClasses.filter((usbClass) => {
-      return usbClass.indexOf('audio') === -1;
-    });
-  });
+  mainWindow.webContents.session.setUSBProtectedClassesHandler(() => []);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
