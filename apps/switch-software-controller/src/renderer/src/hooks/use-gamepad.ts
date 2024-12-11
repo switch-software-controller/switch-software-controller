@@ -14,7 +14,8 @@ export function useGamepad(controller: Controller, gamepadId: string) {
         .getGamepads()
         .filter((gamepad) => gamepad !== null && gamepad !== undefined)
         .find((gamepad) => gamepad.id === id);
-      controller_.send(stateChangerByGamepad(gamepad))
+      controller_
+        .send(stateChangerByGamepad(gamepad))
         .then(() => {
           setRequestId(requestAnimationFrame(gamepadFrame));
         })
