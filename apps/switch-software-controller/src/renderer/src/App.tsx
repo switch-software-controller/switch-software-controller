@@ -1,12 +1,9 @@
 import path from 'node:path';
 import { app } from '@electron/remote';
-import { useController } from '@renderer/hooks/use-controller';
-import { useGamepad, useGamepads } from '@renderer/hooks/use-gamepad';
 import { useSerialPorts } from '@renderer/hooks/use-serial-ports';
 import { useVideo } from '@renderer/hooks/use-video';
 import type React from 'react';
 import { useEffect } from 'react';
-import { BsController } from 'react-icons/bs';
 import { CiVideoOn } from 'react-icons/ci';
 import { FaUsb } from 'react-icons/fa';
 
@@ -37,14 +34,7 @@ function App(): React.JSX.Element {
     selectedSerialPort,
     selectSerialPort,
     connectSelectedSerialPort,
-    connectedSerialPort,
   } = useSerialPorts();
-
-  const { controller } = useController(connectedSerialPort);
-
-  const { gamepads, updateGamepads, selectGamepad, selectedGamepad } =
-    useGamepads();
-  const { startUpdateGamepad } = useGamepad(controller, selectedGamepad?.id);
 
   useEffect(() => {
     getVideoInputDevices().then((devices) => {
@@ -131,35 +121,6 @@ function App(): React.JSX.Element {
                     Connect
                   </button>
                 </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
-                  <BsController />
-                  <select
-                    className="flex-1 bg-surface-dim"
-                    onChange={(e) => selectGamepad(e.target.value)}
-                  >
-                    {gamepads.map((gamepad) => {
-                      return (
-                        <option key={gamepad.id} value={gamepad.id}>
-                          {gamepad.id}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <button
-                    className="rounded-md bg-primary px-2 text-on-primary"
-                    onClick={startUpdateGamepad}
-                  >
-                    Connect
-                  </button>
-                </div>
-                <button
-                  className="flex-1 rounded-md bg-primary px-2 text-on-primary"
-                  onClick={updateGamepads}
-                >
-                  Update Gamepads
-                </button>
               </div>
             </div>
             <div className="flex flex-1 p-2">
