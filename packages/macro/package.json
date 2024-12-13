@@ -15,12 +15,12 @@
   "dependencies": {
     "@switch-software-controller/controller": "*",
     "@switch-software-controller/path-utils": "*",
-    "@switch-software-controller/timer": "*"
+    "@switch-software-controller/stopwatch": "*"
   },
   "devDependencies": {
     "@switch-software-controller/controller-api": "*",
     "@switch-software-controller/logger-api": "*",
     "@switch-software-controller/macro-api": "*",
-    "@switch-software-controller/timer-api": "*"
+    "@switch-software-controller/stopwatch-api": "*"
   }
 }

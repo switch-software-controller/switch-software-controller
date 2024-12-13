@@ -7,7 +7,10 @@ import {
   StickTiltPreset,
 } from '@switch-software-controller/controller-api';
 import type { Logger } from '@switch-software-controller/logger-api';
-import type { ElapsedTime, Timer } from '@switch-software-controller/timer-api';
+import type {
+  ElapsedTime,
+  Stopwatch,
+} from '@switch-software-controller/stopwatch-api';
 import type { MacroPath } from './path.ts';
 
 /**
@@ -70,9 +73,9 @@ export abstract class BaseMacro {
   readonly controller: Controller;
 
   /**
-   * The timer for the macro.
+   * The stopwatch for the macro.
    */
-  readonly timer: Timer;
+  readonly stopwatch: Stopwatch;
 
   /**
    * The logger for the macro.
@@ -104,14 +107,14 @@ export abstract class BaseMacro {
     name: string,
     path: MacroPath,
     controller: Controller,
-    timer: Timer,
+    stopwatch: Stopwatch,
     logger: Logger,
     waiter: Waiter,
   ) {
     this.name = name;
     this.path = path;
     this.controller = controller;
-    this.timer = timer;
+    this.stopwatch = stopwatch;
     this.logger = logger;
     this.waiter = waiter;
   }
@@ -137,7 +140,7 @@ export abstract class BaseMacro {
    * The elapsed time since the macro started.
    */
   get elapsedTime(): ElapsedTime {
-    return this.timer.elapsedTime;
+    return this.stopwatch.elapsedTime;
   }
 
   /**
@@ -202,7 +205,7 @@ export abstract class BaseMacro {
    * Preprocess the macro.
    */
   preprocess() {
-    this.timer.start();
+    this.stopwatch.start();
     this._isCancelled = false;
     this._attemptCount = 0;
   }
@@ -211,7 +214,7 @@ export abstract class BaseMacro {
    * Postprocess the macro.
    */
   postprocess() {
-    this.timer.stop();
+    this.stopwatch.stop();
   }
 
   /**
