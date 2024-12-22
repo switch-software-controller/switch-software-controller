@@ -2,53 +2,49 @@ import type {
   SerialPort as Base,
   SerialPortOpenOptions,
 } from '@switch-software-controller/serial-port-api';
+import { SerialPort } from 'serialport';
 
-export interface Encoder {
-  encode(data: string): Uint8Array;
+export type SerialPortInfo = {
+  path: string;
+  serialNumber: string | undefined;
+  productId: string | undefined;
+  vendorId: string | undefined;
+};
+
+export function listSerialPort(): Promise<SerialPortInfo[]> {
+  return SerialPort.list();
 }
 
 export class SerialPortImpl implements Base {
-  private writer_: WritableStreamDefaultWriter<Uint8Array> | null = null;
-  private readonly port: SerialPort;
-  private readonly encoder: Encoder;
-
-  constructor(port: SerialPort, encoder: Encoder) {
-    this.port = port;
-    this.encoder = encoder;
-  }
-
-  private get writer(): WritableStreamDefaultWriter<Uint8Array> {
-    if (!this.writer_) {
-      this.writer_ = this.port.writable.getWriter();
-    }
-    return this.writer_;
-  }
+  private port: SerialPort = undefined;
 
   async open(options: SerialPortOpenOptions): Promise<void> {
+    if (this.port !== undefined) {
+      await this.close();
+    }
     try {
-      await this.port.open(options)
+      this.port = new SerialPort({
+        path: options.path,
+        baudRate: options.baudRate,
+      });
     } catch (err) {
       console.log(`[Error] open: ${err}`);
     }
   }
 
   async close(): Promise<void> {
-    try {
-      await this.port.close();
-    } catch (err) {
-      console.log(`[Error] close: ${err}`);
+    if (this.port !== undefined) {
+      this.port.close((e) => {
+        console.log(`[Error] close: ${e}`);
+      });
     }
   }
 
   async write(data: string): Promise<void> {
-    console.debug(`[Debug] write: ${data}`);
-    try {
-      const encoded = this.encoder.encode(data);
-      await this.writer.write(encoded);
-      const hex = Array.from(encoded).map((n) => `0x${n.toString(16).padStart(2, '0')}`).join(' ');
-      console.debug(`[Debug] write: ${hex}`);
-    } catch (err) {
-      console.error(`[Error] write: ${err}`);
+    if (this.port !== undefined) {
+      this.port.write(data, 'utf-8', (e) => {
+        console.log(`[Error] write: ${e}`);
+      });
     }
   }
 

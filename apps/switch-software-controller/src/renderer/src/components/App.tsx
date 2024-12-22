@@ -1,12 +1,9 @@
 import path from 'node:path';
 import { app } from '@electron/remote';
-import { useController } from '@renderer/hooks/use-controller';
-import { useGamepad, useGamepads } from '@renderer/hooks/use-gamepad';
-import { useUsb } from '@renderer/hooks/use-usb';
+import { useSerialPorts } from '@renderer/hooks/use-serial-ports';
 import { useVideo } from '@renderer/hooks/use-video';
 import type React from 'react';
 import { useEffect } from 'react';
-import { BsController } from 'react-icons/bs';
 import { CiVideoOn } from 'react-icons/ci';
 import { FaUsb } from 'react-icons/fa';
 
@@ -32,18 +29,12 @@ function App(): React.JSX.Element {
   } = useVideo(videoElement);
 
   const {
-    usbDevices,
-    updateUsbDevices,
-    selectUsbDevice,
-    connectUsbDevice,
-    connectedUsbDevice,
-  } = useUsb();
-
-  const { controller } = useController(connectedUsbDevice);
-
-  const { gamepads, updateGamepads, selectGamepad, selectedGamepad } =
-    useGamepads();
-  const { startUpdateGamepad } = useGamepad(controller, selectedGamepad?.id);
+    serialPorts,
+    updateSerialPorts,
+    selectedSerialPort,
+    selectSerialPort,
+    connectSelectedSerialPort,
+  } = useSerialPorts();
 
   useEffect(() => {
     getVideoInputDevices().then((devices) => {
@@ -58,10 +49,10 @@ function App(): React.JSX.Element {
   }, [videoInputDevices, selectVideoInputDevice]);
 
   useEffect(() => {
-    updateUsbDevices().catch((err) => {
+    updateSerialPorts().catch((err) => {
       console.error(`[Error] update usb devices: ${err}`);
     });
-  }, [updateUsbDevices]);
+  }, [updateSerialPorts]);
 
   return (
     <div className="h-dvh bg-surface">
@@ -99,57 +90,37 @@ function App(): React.JSX.Element {
                   <select
                     className="flex-1 bg-surface-dim"
                     onChange={async (e) => {
-                      selectUsbDevice(e.target.value);
-                      await connectUsbDevice({ baudRate: 9600 });
+                      selectSerialPort(e.target.value);
                     }}
                   >
-                    {usbDevices.map((device) => {
+                    {serialPorts.map((info) => {
                       return (
-                        <option
-                          key={device.serialNumber}
-                          value={device.serialNumber}
-                        >
-                          {device.productName}
+                        <option key={info.path} value={info.path}>
+                          {info.serialNumber}({info.path})
                         </option>
                       );
                     })}
                   </select>
                 </div>
-                <button
-                  className='flex-1 rounded-md bg-primary px-2 text-on-primary'
-                  onClick={updateUsbDevices}
-                >
-                  Update USB Devices
-                </button>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
-                  <BsController />
-                  <select
-                    className="flex-1 bg-surface-dim"
-                    onChange={(e) => selectGamepad(e.target.value)}
-                  >
-                    {gamepads.map((gamepad) => {
-                      return (
-                        <option key={gamepad.id} value={gamepad.id}>
-                          {gamepad.id}
-                        </option>
-                      );
-                    })}
-                  </select>
+                <div>
                   <button
-                    className="rounded-md bg-primary px-2 text-on-primary"
-                    onClick={startUpdateGamepad}
+                    className="flex-1 rounded-md bg-primary px-2 text-on-primary"
+                    onClick={updateSerialPorts}
+                  >
+                    Update Serial Ports
+                  </button>
+                  <button
+                    className="flex-1 rounded-md bg-primary px-2 text-on-primary"
+                    onClick={async () => {
+                      await connectSelectedSerialPort({
+                        path: selectedSerialPort.path,
+                        baudRate: 9600,
+                      });
+                    }}
                   >
                     Connect
                   </button>
                 </div>
-                <button
-                  className='flex-1 rounded-md bg-primary px-2 text-on-primary'
-                  onClick={updateGamepads}
-                >
-                  Update Gamepads
-                </button>
               </div>
             </div>
             <div className="flex flex-1 p-2">
