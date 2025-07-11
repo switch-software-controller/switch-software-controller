@@ -1,6 +1,6 @@
 import path from 'node:path';
 import remote from '@electron/remote/main';
-import { BrowserWindow, app, shell } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import started from 'electron-squirrel-startup';
 import icon from '../../resources/icon.png?asset';
 import { platform } from './platform';
