@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 import renderer from 'vite-plugin-electron-renderer';
 
 // https://vitejs.dev/config
@@ -19,10 +20,7 @@ export default defineConfig({
     }
   },
   plugins: [
-    renderer({
-      resolve: {
-        serialport: { type: 'cjs' },
-      },
-    }),
+    tailwindcss(),
+    renderer(),
   ],
 });
