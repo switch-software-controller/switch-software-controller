@@ -7,7 +7,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, '.vite', 'build'),
     rollupOptions: {
       input: {
-        preload: 'src/preload/index.ts',
+        preload: path.resolve(__dirname, 'src', 'preload', 'index.ts'),
       },
     },
   },
