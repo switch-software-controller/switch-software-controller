@@ -1,4 +1,5 @@
 export type SerialPortOpenOptions = {
+  path: string;
   baudRate: number;
 };
 
