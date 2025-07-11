@@ -1,7 +1,7 @@
 import {
   type StickTilt,
   StickTiltPreset,
-} from "@switch-software-controller/controller-api";
+} from '@switch-software-controller/controller-api';
 
 export const StickTiltRange = {
   Min: 0,

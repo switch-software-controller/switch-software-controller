@@ -1,4 +1,4 @@
-import type { Hat } from "../primitives";
+import type { Hat } from '../primitives';
 
 /**
  * Represents the state of a hat.

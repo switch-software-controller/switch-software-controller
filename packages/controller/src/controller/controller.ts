@@ -2,8 +2,8 @@ import type {
   Controller,
   ControllerState,
   StateChanger,
-} from "@switch-software-controller/controller-api";
-import type { SerialPort } from "@switch-software-controller/serial-port-api";
+} from '@switch-software-controller/controller-api';
+import type { SerialPort } from '@switch-software-controller/serial-port-api';
 
 /**
  * The default implementation of the `Controller`.
@@ -20,11 +20,13 @@ export class ControllerImpl implements Controller {
     private readonly port: SerialPort,
   ) {}
 
-  send(stateChanger?: StateChanger): void {
+  async send(stateChanger?: StateChanger): Promise<void> {
     stateChanger?.(this.state);
     const serialized = this.serialize(this.state);
     this.state.consumeSticks();
-    this.port.writeLine(serialized);
+    console.log(`[Debug] sending: ${serialized}`);
+    await this.port.writeLine(serialized);
+    console.log(`[Debug] sent: ${serialized}`);
   }
 
   /**
@@ -37,8 +39,8 @@ export class ControllerImpl implements Controller {
       return Number(n).toString(16);
     };
 
-    let strL = "";
-    let strR = "";
+    let strL = '';
+    let strR = '';
 
     let flag = state.buttons.value << 2;
     if (state.lStick.isDirty) {
@@ -49,6 +51,6 @@ export class ControllerImpl implements Controller {
       flag |= 0x1;
       strR = `${hex(state.rStick.x)} ${hex(state.rStick.y)}`;
     }
-    return `0x${hex(flag).padStart(4, "0")} ${state.hat.value} ${strL} ${strR}`;
+    return `0x${hex(flag).padStart(4, '0')} ${state.hat.value} ${strL} ${strR}`;
   }
 }

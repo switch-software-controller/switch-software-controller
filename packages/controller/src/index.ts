@@ -1,11 +1,11 @@
+export { ControllerImpl } from './controller';
 export {
   StickTiltImpl,
   StickTiltPresetDefault,
-} from "./primitives/stick-tilt.ts";
+} from './primitives/stick-tilt.ts';
 export {
   ButtonStateImpl,
+  ControllerStateImpl,
   HatStateImpl,
   StickStateImpl,
-  ControllerStateImpl,
-} from "./state";
-export { ControllerImpl } from "./controller";
+} from './state';

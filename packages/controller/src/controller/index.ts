@@ -1,1 +1,1 @@
-export { ControllerImpl } from "./controller.ts";
+export { ControllerImpl } from './controller.ts';

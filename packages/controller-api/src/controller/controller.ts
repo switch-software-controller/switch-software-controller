@@ -1,4 +1,4 @@
-import type { StateChanger } from "./state-changer.ts";
+import type { StateChanger } from './state-changer.ts';
 
 /**
  * The controller that can send input to the device.
@@ -10,5 +10,5 @@ export interface Controller {
    *
    * @param stateChanger A function that changes the controller state. called before sending the state.
    */
-  send(stateChanger?: StateChanger): void;
+  send(stateChanger?: StateChanger): Promise<void>;
 }

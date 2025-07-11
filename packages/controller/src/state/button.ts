@@ -1,8 +1,8 @@
 import {
   Button,
   type ButtonState,
-} from "@switch-software-controller/controller-api";
-import { ButtonValue } from "../primitives";
+} from '@switch-software-controller/controller-api';
+import { ButtonValue } from '../primitives';
 
 /**
  * Default Implementation of ButtonState

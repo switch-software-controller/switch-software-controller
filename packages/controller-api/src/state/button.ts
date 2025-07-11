@@ -1,4 +1,4 @@
-import type { Button } from "../primitives";
+import type { Button } from '../primitives';
 
 /**
  * Represents the state of a buttons.
