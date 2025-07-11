@@ -27,12 +27,12 @@ export class MacroCancelledError extends Error {
  */
 export function checkCancelled(): MethodDecorator {
   return (_target, _propertyKey, descriptor) => {
-    // biome-ignore lint/suspicious/noExplicitAny:
+    // biome-ignore lint/suspicious/noExplicitAny: skip check
     const originalMethod = descriptor.value as (...args: any[]) => any;
-    // biome-ignore lint/suspicious/noExplicitAny:
+    // biome-ignore lint/suspicious/noExplicitAny: skip check
     (descriptor as any).value = function (...args: any[]) {
       const ret = originalMethod.apply(this, args);
-      // biome-ignore lint/suspicious/noExplicitAny:
+      // biome-ignore lint/suspicious/noExplicitAny: skip check
       const isCancelled: boolean = (this as any).isCancelled ?? false;
       if (isCancelled) {
         throw new MacroCancelledError();

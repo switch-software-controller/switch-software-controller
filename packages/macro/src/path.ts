@@ -1,7 +1,7 @@
 import type { MacroPath } from '@switch-software-controller/macro-api';
 import {
-  type PathJoiner,
   normalizeFileName,
+  type PathJoiner,
 } from '@switch-software-controller/path-utils';
 
 /**
