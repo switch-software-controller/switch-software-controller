@@ -1,6 +1,6 @@
 import path from 'node:path';
 import remote from '@electron/remote/main';
-import { BrowserWindow, app, shell } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import started from 'electron-squirrel-startup';
 import icon from '../../resources/icon.png?asset';
 import { platform } from './platform';
@@ -23,7 +23,10 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       sandbox: false,
       nodeIntegration: true,
+      nodeIntegrationInWorker: true,
+      nodeIntegrationInSubFrames: true,
       contextIsolation: false,
+      experimentalFeatures: true,
     },
   });
   remote.enable(mainWindow.webContents);
@@ -36,6 +39,35 @@ const createWindow = () => {
     shell.openExternal(details.url);
     return { action: 'deny' };
   });
+
+  mainWindow.webContents.session.on(
+    'select-serial-port',
+    (event, portList, webContents, callback) => {
+      event.preventDefault();
+      if (portList && portList.length > 0) {
+        callback(portList[0].portId);
+      } else {
+        callback('');
+      }
+    },
+  );
+  mainWindow.webContents.session.on(
+    'select-usb-device',
+    (event, details, callback) => {
+      event.preventDefault();
+      const deviceList = details.deviceList;
+      if (deviceList && deviceList.length > 0) {
+        callback(deviceList[0].deviceId);
+      } else {
+        callback();
+      }
+    },
+  );
+
+  // permission handlers
+  mainWindow.webContents.session.setPermissionCheckHandler(() => true);
+  mainWindow.webContents.session.setDevicePermissionHandler(() => true);
+  mainWindow.webContents.session.setUSBProtectedClassesHandler(() => []);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

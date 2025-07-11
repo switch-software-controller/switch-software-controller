@@ -1,4 +1,7 @@
-import type { ElapsedTime, Timer } from '@switch-software-controller/timer-api';
+import type {
+  ElapsedTime,
+  Stopwatch,
+} from '@switch-software-controller/stopwatch-api';
 
 const secondsInMinute = 60;
 const secondsInHour = 3600; // 60 * 60
@@ -7,22 +10,19 @@ const minutesInHour = 60;
 const hoursInDay = 24;
 
 /**
- * A default implementation of the `Timer` interface.
+ * A default implementation of the `Stopwatch` interface.
  */
-export class TimerImpl implements Timer {
+export class StopwatchImpl implements Stopwatch {
   private startTime: number | null = null;
   private stopTime: number | null = null;
 
   /**
-   * Creates a new `TimerImpl` instance.
+   * Creates a new `StopwatchImpl` instance.
    *
    * @param now A function that returns the current time in seconds since the Unix epoch.
    */
   constructor(private readonly now: () => number) {}
 
-  /**
-   * Starts the timer.
-   */
   start() {
     this.startTime = this.now();
   }
