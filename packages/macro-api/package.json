@@ -1,6 +1,6 @@
 {
   "name": "@switch-software-controller/macro-api",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -11,8 +11,8 @@
     "check": "biome check --write ./src"
   },
   "dependencies": {
-    "@switch-software-controller/controller-api": "*",
-    "@switch-software-controller/logger-api": "*",
-    "@switch-software-controller/stopwatch-api": "*"
+    "@switch-software-controller/controller-api": "^0.0.1",
+    "@switch-software-controller/logger-api": "^0.0.1",
+    "@switch-software-controller/stopwatch-api": "^0.0.1"
   }
 }
