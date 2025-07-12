@@ -1,0 +1,6 @@
+node_modules
+.gitignore
+.biome.json
+vite.config
+vitest.config.ts
+src
