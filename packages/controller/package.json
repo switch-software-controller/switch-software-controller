@@ -16,5 +16,5 @@
     "@switch-software-controller/controller-api": "^0.0.4",
     "@switch-software-controller/serial-port-api": "^0.0.4"
   },
-  "gitHead": "5c9c65a448b90bc6249ef08f6806220359b506e6"
+  "gitHead": "a5427d3cd562f60635919401cf3baaa7d1201374"
 }
