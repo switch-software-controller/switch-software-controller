@@ -1,5 +1,7 @@
 # Switch Software Controller
 
+[![Node.js CI](https://github.com/switch-software-controller/switch-software-controller/actions/workflows/nodejs-ci.yml/badge.svg?branch=main)](https://github.com/switch-software-controller/switch-software-controller/actions/workflows/nodejs-ci.yml)
+
 A tool for automating Nintendo Switch/Nintendo Switch 2 (hereafter referred to as Switch).
 Note that this product is under development, and the features described below are not yet fully implemented.
 
