@@ -42,5 +42,6 @@
     "@switch-software-controller/serial-port-api": "^0.0.1",
     "@types/electron-squirrel-startup": "1.0.2",
     "electron": "37.2.1"
-  }
+  },
+  "gitHead": "ff5a0fc602bccb73a9fd33c7bac931547264ff6b"
 }

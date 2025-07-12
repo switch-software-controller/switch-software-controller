@@ -9,5 +9,6 @@
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
-  }
+  },
+  "gitHead": "ff5a0fc602bccb73a9fd33c7bac931547264ff6b"
 }

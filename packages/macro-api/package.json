@@ -14,5 +14,6 @@
     "@switch-software-controller/controller-api": "^0.0.1",
     "@switch-software-controller/logger-api": "^0.0.1",
     "@switch-software-controller/stopwatch-api": "^0.0.1"
-  }
+  },
+  "gitHead": "ff5a0fc602bccb73a9fd33c7bac931547264ff6b"
 }
