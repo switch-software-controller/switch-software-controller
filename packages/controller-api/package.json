@@ -1,6 +1,6 @@
 {
   "name": "@switch-software-controller/controller-api",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -9,6 +9,9 @@
     "format": "biome format --write ./src",
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "gitHead": "a5427d3cd562f60635919401cf3baaa7d1201374"
 }

@@ -1,6 +1,6 @@
 {
   "name": "@switch-software-controller/stopwatch",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -13,7 +13,10 @@
     "check": "biome check --write ./src"
   },
   "devDependencies": {
-    "@switch-software-controller/stopwatch-api": "^0.0.4"
+    "@switch-software-controller/stopwatch-api": "^0.0.5"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "gitHead": "a5427d3cd562f60635919401cf3baaa7d1201374"
 }
