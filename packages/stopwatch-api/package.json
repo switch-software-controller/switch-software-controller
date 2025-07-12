@@ -1,6 +1,6 @@
 {
   "name": "@switch-software-controller/stopwatch-api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
