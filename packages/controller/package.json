@@ -1,6 +1,6 @@
 {
   "name": "@switch-software-controller/controller",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -13,8 +13,8 @@
     "check": "biome check --write ./src"
   },
   "devDependencies": {
-    "@switch-software-controller/controller-api": "^0.0.1",
-    "@switch-software-controller/serial-port-api": "^0.0.1"
+    "@switch-software-controller/controller-api": "^0.0.2",
+    "@switch-software-controller/serial-port-api": "^0.0.2"
   },
   "gitHead": "ff5a0fc602bccb73a9fd33c7bac931547264ff6b"
 }
