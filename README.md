@@ -1,34 +1,34 @@
 # Switch Software Controller
 
-Nintendo Switch/Nintendo Switch 2(以下Switch)の自動化を行うためのツールです。
-また、このプロダクトは開発中のもので、以下で説明している機能の実装はまだ完了していません。
+A tool for automating Nintendo Switch/Nintendo Switch 2 (hereafter referred to as Switch).
+Note that this product is under development, and the features described below are not yet fully implemented.
 
 ## Features
 
-### Switchのゲーム画面をキャプチャ
+### Switch Game Screen Capture
 
-- Switchのゲーム画面をリアルタイムでキャプチャできます。
-- キャプチャした画像はOCR(Optical Character Recognition)で解析し、テキスト情報を取得できます。
-- キャプチャした画像はTemplate Matchingで解析し、特定の画像を検出できます。
-- ゲーム画面のスクリーンショットを取得し、画像ファイルとして保存できます。
+- Real-time capture of Switch game screens.
+- Captured images can be analyzed using OCR (Optical Character Recognition) to extract text information.
+- Captured images can be analyzed using Template Matching to detect specific images.
+- Screenshots of the game screen can be taken and saved as image files.
 
-### ゲーム操作の自動化
+### Game Operation Automation
 
-- Switchのゲーム操作を自動化するためのAPIを提供します。
-- APIを使用して、ゲームの操作をスクリプトをマクロとして記述できます。
-- 解析したテキスト情報や検出した画像を使用して、ゲームの状態に応じた操作を行えます。
-- APIはTypeScriptで提供されており、型安全なコードを書くことができます。
+- Provides APIs for automating Switch game operations.
+- Using the API, game operations can be written as macros.
+- Operations can be performed based on game state using analyzed text information and detected images.
+- The API is provided in TypeScript, allowing for type-safe code.
 
-### Gamepadとの連携
+### Gamepad Integration
 
-- Gamepadの入力を取得し、Switchのゲームを操作することができます。
-- Gamepadの入力を記録して、マクロとして保存することができます。
+- Gamepad input can be captured to control Switch games.
+- Gamepad input can be recorded and saved as macros.
 
-## マクロの自作
+## Creating Custom Macros
 
-マクロの自作には`@swicth-software-controller/macro-api`と`@switch-software-controller/controller-api`パッケージを使用します。
+Custom macros use the `@switch-software-controller/macro-api` and `@switch-software-controller/controller-api` packages.
 
-### 開発環境のセットアップ
+### Development Environment Setup
 
 ```bash
 $ mkdir my-macro
@@ -37,7 +37,7 @@ $ npm init -y
 $ npm install @switch-software-controller/macro-api @switch-software-controller/controller-api
 ```
 
-### 実装例
+### Implementation Example
 
 ```typescript
 import { BaseMacro } from '@switch-software-controller/macro-api';
@@ -45,15 +45,15 @@ import { Button, StickTiltPreset } from '@switch-software-controller/controller-
 
 class MyMacro extends BaseMacro {
   async process() {
-    // マクロの実行内容をここに記述します。
-    // 例: 0.5秒間 Aボタンを押す
+    // Write macro execution content here.
+    // Example: Press A button for 0.5 seconds
     await this.pressA(500);
 
-    // 例: 1秒待機
+    // Example: Wait for 1 second
     await this.wait(1000);
 
-    // 例: 複雑な操作を行う
-    // 5秒間 AボタンとBボタンを押し、左スティックを右に傾ける
+    // Example: Perform complex operations
+    // Press A and B buttons for 5 seconds while tilting left stick to the right
     this.controller.send((state) => {
       state.buttons.press([Button.A, Button.B]);
       state.lStick.tiltPreset(StickTiltPreset.Right);
@@ -64,30 +64,30 @@ class MyMacro extends BaseMacro {
 }
 ```
 
-## リポジトリの構造
+## Repository Structure
 
-- リポジトリはモノレポ構成になっており、各機能は独立したパッケージとして管理されています。
+- The repository is configured as a monorepo, with each feature managed as an independent package.
 
 ### apps
 
-- `apps/switch-software-controller`: Switch Software Controllerのアプリケーションです。
+- `apps/switch-software-controller`: The Switch Software Controller application.
 
 ### packages
 
-Switch Software Controllerは以下のパッケージを利用しています。
+Switch Software Controller uses the following packages:
 
-- `packages/controller`: Gamepadの入力を取得し、Switchのゲームを操作するためのパッケージです。
-- `packages/controller-api`:　`packages/controller`のAPIを定義しているパッケージです。
-- `packages/logger-api`: ログ出力のためのAPIを提供するパッケージです。
-- `packages/macro`: ゲーム操作を自動化するためのマクロを定義するパッケージです。
-- `packages/macro-api`: `packages/macro`のAPIを定義しているパッケージです。
-- `packages/path-utils`: パス操作のユーティリティを提供するパッケージです。
-- `packages/serial-port-api`: シリアルポート通信のためのAPIを提供するパッケージです。
-- `packages/stopwatch`: ストップウォッチ機能を提供するパッケージです。
-- `packages/stopwatch-api`: `packages/stopwatch`のAPIを定義しているパッケージです。
-- `packages/timeline-api`: タイムライン機能を提供するパッケージです。
+- `packages/controller`: Package for capturing gamepad input and controlling Switch games.
+- `packages/controller-api`: Package defining the API for `packages/controller`.
+- `packages/logger-api`: Package providing API for log output.
+- `packages/macro`: Package defining macros for automating game operations.
+- `packages/macro-api`: Package defining the API for `packages/macro`.
+- `packages/path-utils`: Package providing path manipulation utilities.
+- `packages/serial-port-api`: Package providing API for serial port communication.
+- `packages/stopwatch`: Package providing stopwatch functionality.
+- `packages/stopwatch-api`: Package defining the API for `packages/stopwatch`.
+- `packages/timeline-api`: Package providing timeline functionality.
 
 ## Architecture
 
-Poke-Controllerと同様のアーキテクチャを採用しています。
-詳しくはコミュニティのドキュメント[機材の準備・購入](https://pokecontroller.info/preparation)を参照してください。
+Adopts an architecture similar to Poke-Controller.
+For details, refer to the community documentation [Equipment Preparation and Purchase](https://pokecontroller.info/preparation).
