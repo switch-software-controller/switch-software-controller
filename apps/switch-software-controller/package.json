@@ -5,6 +5,7 @@
   "description": "Software controller for Nintendo Switch",
   "author": "carimatics",
   "license": "MIT",
+  "private": true,
   "keywords": [],
   "main": ".vite/build/main.js",
   "scripts": {
