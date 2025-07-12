@@ -1,0 +1,42 @@
+name: 'Feature Request'
+description: Suggest a feature for Switch Software Controller
+
+body:
+  - type: dropdown
+    id: affected-packages
+    attributes:
+      label: Which @switch-software-controller/* package(s) are relevant/related to the feature request?
+      options:
+        - switch-software-controller
+        - controller
+        - controller-api
+        - logger-api
+        - macro
+        - macro-api
+        - path-utils
+        - serial-port-api
+        - stopwatch
+        - stopwatch-api
+        - timeline-api
+      multiple: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: true
