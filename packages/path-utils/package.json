@@ -12,5 +12,5 @@
     "lint": "biome lint --write ./src",
     "check": "biome check --write ./src"
   },
-  "gitHead": "992d7a5795994409d50bb848e592420d5efa3d78"
+  "gitHead": "5c9c65a448b90bc6249ef08f6806220359b506e6"
 }
