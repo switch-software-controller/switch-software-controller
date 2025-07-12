@@ -1,7 +1,7 @@
 {
   "name": "@switch-software-controller/switch-software-controller",
   "productName": "Switch Software Controller",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Software controller for Nintendo Switch",
   "author": "carimatics",
   "license": "MIT",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@electron/remote": "2.1.3",
-    "@switch-software-controller/controller": "^0.0.3",
+    "@switch-software-controller/controller": "^0.0.4",
     "electron-squirrel-startup": "1.0.1",
     "react-icons": "5.5.0",
     "serialport": "^13.0.0",
@@ -38,8 +38,8 @@
     "@electron-forge/plugin-vite": "7.8.1",
     "@electron/fuses": "1.8.0",
     "@electron/rebuild": "4.0.1",
-    "@switch-software-controller/controller-api": "^0.0.3",
-    "@switch-software-controller/serial-port-api": "^0.0.3",
+    "@switch-software-controller/controller-api": "^0.0.4",
+    "@switch-software-controller/serial-port-api": "^0.0.4",
     "@types/electron-squirrel-startup": "1.0.2",
     "electron": "37.2.1"
   },

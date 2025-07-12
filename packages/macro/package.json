@@ -1,6 +1,6 @@
 {
   "name": "@switch-software-controller/macro",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -13,15 +13,15 @@
     "check": "biome check --write ./src"
   },
   "dependencies": {
-    "@switch-software-controller/controller": "^0.0.3",
-    "@switch-software-controller/path-utils": "^0.0.3",
-    "@switch-software-controller/stopwatch": "^0.0.3"
+    "@switch-software-controller/controller": "^0.0.4",
+    "@switch-software-controller/path-utils": "^0.0.4",
+    "@switch-software-controller/stopwatch": "^0.0.4"
   },
   "devDependencies": {
-    "@switch-software-controller/controller-api": "^0.0.3",
-    "@switch-software-controller/logger-api": "^0.0.3",
-    "@switch-software-controller/macro-api": "^0.0.3",
-    "@switch-software-controller/stopwatch-api": "^0.0.3"
+    "@switch-software-controller/controller-api": "^0.0.4",
+    "@switch-software-controller/logger-api": "^0.0.4",
+    "@switch-software-controller/macro-api": "^0.0.4",
+    "@switch-software-controller/stopwatch-api": "^0.0.4"
   },
   "gitHead": "5c9c65a448b90bc6249ef08f6806220359b506e6"
 }
