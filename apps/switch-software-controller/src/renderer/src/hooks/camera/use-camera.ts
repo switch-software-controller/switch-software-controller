@@ -45,7 +45,7 @@ export function useCamera(
   );
 
   useEffect(() => {
-    if (currentDevice) {
+    if (currentDevice && videoElement) {
       navigator.mediaDevices
         .getUserMedia({
           video: { deviceId: currentDevice.deviceId },
@@ -58,7 +58,7 @@ export function useCamera(
     }
 
     return () => {
-      if (videoElement.srcObject) {
+      if (videoElement?.srcObject) {
         const stream = videoElement.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
         videoElement.srcObject = null;
