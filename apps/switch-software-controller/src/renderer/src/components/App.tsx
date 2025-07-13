@@ -2,21 +2,22 @@ import path from 'node:path';
 import { app } from '@electron/remote';
 import { useCamera } from '@renderer/hooks';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const dataDir = path.join(app.getPath('userData'), 'ssc-data');
 
 function App(): React.JSX.Element {
-  const videoElementId = 'camera';
-  const video = useMemo(
-    () => document.getElementById(videoElementId) as HTMLVideoElement,
-    [],
-  );
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
-  const { takeScreenshot, currentDevice, setCurrentDevice } = useCamera(video);
-  const resetDevices = useCallback(() => {
-    navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { takeScreenshot, currentDevice, setCurrentDevice } = useCamera(videoRef.current);
+  const resetDevices = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const mediaDevices = await navigator.mediaDevices.enumerateDevices();
       const videoInputs = mediaDevices.filter(
         (device) => device.kind === 'videoinput',
       );
@@ -24,8 +25,12 @@ function App(): React.JSX.Element {
       if (videoInputs.length > 0) {
         setCurrentDevice(videoInputs[0]);
       }
-    });
-  }, [setDevices, setCurrentDevice]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to enumerate devices');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setCurrentDevice]);
 
   useEffect(() => {
     resetDevices();
@@ -34,8 +39,10 @@ function App(): React.JSX.Element {
 
   return (
     <div>
+      {error && <div className="text-red-600">Error: {error}</div>}
+      {isLoading && <div>Loading devices...</div>}
       <select
-        value={currentDevice?.deviceId}
+        value={currentDevice?.deviceId ?? ''}
         onChange={(event) => {
           const deviceId = event.target.value;
           const device = devices.find((device) => device.deviceId === deviceId);
@@ -43,7 +50,9 @@ function App(): React.JSX.Element {
             setCurrentDevice(device);
           }
         }}
+        disabled={isLoading}
       >
+        <option value="">Select a camera</option>
         {devices.map((device) => (
           <option key={device.deviceId} value={device.deviceId}>
             {device.label || `Device ${device.deviceId}`}
@@ -54,10 +63,11 @@ function App(): React.JSX.Element {
         onClick={() =>
           takeScreenshot(path.join(dataDir, 'captures', 'screenshot.png'))
         }
+        disabled={!currentDevice}
       >
         Take Screenshot
       </button>
-      <video id={videoElementId} autoPlay={true} className="max-w-full" />
+      <video ref={videoRef} autoPlay={true} className="max-w-full" />
       <div>{path.join(dataDir, 'captures', 'screenshot.png')}</div>
     </div>
   );
