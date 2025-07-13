@@ -1,3 +1,10 @@
+/**
+ * Main entry point for the renderer process
+ *
+ * Sets up the React root and renders the main App component.
+ * The renderer process handles the UI for the Switch Software Controller application.
+ */
+
 import './assets/main.css';
 
 import React from 'react';
