@@ -56,7 +56,15 @@ export function useCamera(
           videoElement.srcObject = stream;
         });
     }
-  }, [currentDevice]);
+
+    return () => {
+      if (videoElement.srcObject) {
+        const stream = videoElement.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoElement.srcObject = null;
+      }
+    };
+  }, [currentDevice, videoElement]);
 
   return {
     currentDevice,
