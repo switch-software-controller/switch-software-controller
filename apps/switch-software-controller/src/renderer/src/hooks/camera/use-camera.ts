@@ -4,10 +4,10 @@ import { MediaTrack } from './media-track';
 
 /**
  * Custom hook for camera functionality
- * 
+ *
  * Provides camera device management, video stream handling, and screenshot capture.
  * Automatically manages MediaStream lifecycle and cleanup.
- * 
+ *
  * @param videoElement - HTML video element to display the camera stream
  * @param initialDeviceInfo - Optional initial camera device to use
  * @returns Object containing camera controls and current device state
@@ -32,10 +32,10 @@ export function useCamera(
 
   /**
    * Captures a screenshot from the current video stream
-   * 
+   *
    * Draws the current video frame to a canvas and saves it as a PNG file.
    * Only works when a camera track is active.
-   * 
+   *
    * @param savePath - File system path where the screenshot will be saved
    */
   const takeScreenshot = useCallback(

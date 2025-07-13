@@ -24,7 +24,7 @@ const buttonMap: [number, Button][] = [
 
 /**
  * Groups gamepad buttons into pressed and released arrays
- * 
+ *
  * @param buttons - Array of gamepad button states
  * @returns Object containing arrays of pressed and released buttons
  */
@@ -44,9 +44,9 @@ function groupButtons(buttons: readonly GamepadButton[]): {
   return { pressed, released };
 }
 
-/** 
+/**
  * Lookup table for D-pad (hat) directions based on button combinations
- * 
+ *
  * Uses 4-bit encoding: Right(8) | Left(4) | Bottom(2) | Top(1)
  */
 const hatLookup: Hat[] = [
@@ -71,9 +71,9 @@ const hatLookup: Hat[] = [
 
 /**
  * Identifies the D-pad (hat) direction from gamepad button states
- * 
+ *
  * Maps buttons 12-15 (D-pad buttons) to hat directions using bit encoding.
- * 
+ *
  * @param buttons - Array of gamepad button states
  * @returns Hat direction corresponding to pressed D-pad buttons
  */
@@ -87,9 +87,9 @@ function identifyHat(buttons: readonly GamepadButton[]): Hat {
 
 /**
  * Calculates stick values from gamepad axes
- * 
+ *
  * Converts normalized axis values (-1 to 1) to Switch controller range (0-255).
- * 
+ *
  * @param axes - Array of gamepad axis values
  * @returns Object containing left and right stick coordinates
  */
@@ -108,11 +108,11 @@ function calculateStickValues(axes: readonly number[]): {
 
 /**
  * Creates a StateChanger function from gamepad input
- * 
+ *
  * Converts gamepad state (buttons, D-pad, and analog sticks) into a function
  * that can update Switch controller state. This enables direct gamepad-to-Switch
  * input mapping.
- * 
+ *
  * @param gamepad - The gamepad object to read input from
  * @returns StateChanger function that applies gamepad state to controller state
  */

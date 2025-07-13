@@ -1,6 +1,6 @@
 /**
  * Wrapper class for MediaStreamTrack that provides convenient access to track dimensions
- * 
+ *
  * Encapsulates a MediaStreamTrack and exposes its width and height properties
  * in a type-safe manner with fallback defaults.
  */
@@ -10,7 +10,7 @@ export class MediaTrack {
 
   /**
    * Creates a new MediaTrack wrapper
-   * 
+   *
    * @param track - The MediaStreamTrack to wrap
    */
   constructor(public track: MediaStreamTrack) {
@@ -19,7 +19,7 @@ export class MediaTrack {
 
   /**
    * Gets the width of the media track
-   * 
+   *
    * @returns Track width in pixels, or 0 if not available
    */
   get width() {
@@ -28,7 +28,7 @@ export class MediaTrack {
 
   /**
    * Gets the height of the media track
-   * 
+   *
    * @returns Track height in pixels, or 0 if not available
    */
   get height() {

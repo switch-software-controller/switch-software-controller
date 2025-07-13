@@ -9,13 +9,13 @@ const dataDir = path.join(app.getPath('userData'), 'ssc-data');
 
 /**
  * Main App component that provides camera control interface
- * 
+ *
  * Features:
  * - Video device enumeration and selection
  * - Live camera preview
  * - Screenshot capture functionality
  * - Error handling and loading states
- * 
+ *
  * @returns React component for the main application interface
  */
 function App(): React.JSX.Element {
@@ -29,7 +29,7 @@ function App(): React.JSX.Element {
   );
   /**
    * Enumerates and loads available video input devices
-   * 
+   *
    * Sets the first available device as the current device if none is selected.
    * Handles loading states and error conditions during device enumeration.
    */
