@@ -12,7 +12,9 @@ function App(): React.JSX.Element {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { takeScreenshot, currentDevice, setCurrentDevice } = useCamera(videoRef.current);
+  const { takeScreenshot, currentDevice, setCurrentDevice } = useCamera(
+    videoRef.current,
+  );
   const resetDevices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -26,7 +28,9 @@ function App(): React.JSX.Element {
         setCurrentDevice(videoInputs[0]);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to enumerate devices');
+      setError(
+        err instanceof Error ? err.message : 'Failed to enumerate devices',
+      );
     } finally {
       setIsLoading(false);
     }

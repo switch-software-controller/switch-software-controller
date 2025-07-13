@@ -60,7 +60,7 @@ export function useCamera(
     return () => {
       if (videoElement?.srcObject) {
         const stream = videoElement.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
         videoElement.srcObject = null;
       }
     };
