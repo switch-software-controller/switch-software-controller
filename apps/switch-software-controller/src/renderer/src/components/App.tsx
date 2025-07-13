@@ -4,8 +4,20 @@ import { useCamera } from '@renderer/hooks';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+/** Data directory path for storing application data */
 const dataDir = path.join(app.getPath('userData'), 'ssc-data');
 
+/**
+ * Main App component that provides camera control interface
+ * 
+ * Features:
+ * - Video device enumeration and selection
+ * - Live camera preview
+ * - Screenshot capture functionality
+ * - Error handling and loading states
+ * 
+ * @returns React component for the main application interface
+ */
 function App(): React.JSX.Element {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -15,6 +27,12 @@ function App(): React.JSX.Element {
   const { takeScreenshot, currentDevice, setCurrentDevice } = useCamera(
     videoRef.current,
   );
+  /**
+   * Enumerates and loads available video input devices
+   * 
+   * Sets the first available device as the current device if none is selected.
+   * Handles loading states and error conditions during device enumeration.
+   */
   const resetDevices = useCallback(async () => {
     setIsLoading(true);
     setError(null);

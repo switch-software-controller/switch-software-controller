@@ -2,6 +2,16 @@ import * as fs from 'node:fs';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MediaTrack } from './media-track';
 
+/**
+ * Custom hook for camera functionality
+ * 
+ * Provides camera device management, video stream handling, and screenshot capture.
+ * Automatically manages MediaStream lifecycle and cleanup.
+ * 
+ * @param videoElement - HTML video element to display the camera stream
+ * @param initialDeviceInfo - Optional initial camera device to use
+ * @returns Object containing camera controls and current device state
+ */
 export function useCamera(
   videoElement: HTMLVideoElement,
   initialDeviceInfo?: MediaDeviceInfo,
@@ -20,6 +30,14 @@ export function useCamera(
   }, [currentTrack]);
   const context = useMemo(() => canvas.getContext('2d'), [canvas]);
 
+  /**
+   * Captures a screenshot from the current video stream
+   * 
+   * Draws the current video frame to a canvas and saves it as a PNG file.
+   * Only works when a camera track is active.
+   * 
+   * @param savePath - File system path where the screenshot will be saved
+   */
   const takeScreenshot = useCallback(
     (savePath: string) => {
       if (currentTrack) {

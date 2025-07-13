@@ -4,7 +4,7 @@ import {
   type StateChanger,
 } from '@switch-software-controller/controller-api';
 
-// buttons
+/** Mapping of gamepad button indices to Switch controller buttons */
 const buttonMap: [number, Button][] = [
   [0, Button.B],
   [1, Button.A],
@@ -21,6 +21,13 @@ const buttonMap: [number, Button][] = [
   [16, Button.Home],
   [17, Button.Capture],
 ];
+
+/**
+ * Groups gamepad buttons into pressed and released arrays
+ * 
+ * @param buttons - Array of gamepad button states
+ * @returns Object containing arrays of pressed and released buttons
+ */
 function groupButtons(buttons: readonly GamepadButton[]): {
   pressed: Button[];
   released: Button[];
@@ -37,7 +44,11 @@ function groupButtons(buttons: readonly GamepadButton[]): {
   return { pressed, released };
 }
 
-// hat
+/** 
+ * Lookup table for D-pad (hat) directions based on button combinations
+ * 
+ * Uses 4-bit encoding: Right(8) | Left(4) | Bottom(2) | Top(1)
+ */
 const hatLookup: Hat[] = [
   /* rlbt */
   /* 0000 */ Hat.Neutral,
@@ -57,6 +68,15 @@ const hatLookup: Hat[] = [
   /* 1110 */ Hat.Bottom,
   /* 1111 */ Hat.Neutral,
 ];
+
+/**
+ * Identifies the D-pad (hat) direction from gamepad button states
+ * 
+ * Maps buttons 12-15 (D-pad buttons) to hat directions using bit encoding.
+ * 
+ * @param buttons - Array of gamepad button states
+ * @returns Hat direction corresponding to pressed D-pad buttons
+ */
 function identifyHat(buttons: readonly GamepadButton[]): Hat {
   const r = buttons[12].pressed ? 0b1000 : 0;
   const l = buttons[13].pressed ? 0b0100 : 0;
@@ -65,7 +85,14 @@ function identifyHat(buttons: readonly GamepadButton[]): Hat {
   return hatLookup[r | l | b | t];
 }
 
-// sticks
+/**
+ * Calculates stick values from gamepad axes
+ * 
+ * Converts normalized axis values (-1 to 1) to Switch controller range (0-255).
+ * 
+ * @param axes - Array of gamepad axis values
+ * @returns Object containing left and right stick coordinates
+ */
 function calculateStickValues(axes: readonly number[]): {
   lx: number;
   ly: number;
@@ -79,6 +106,16 @@ function calculateStickValues(axes: readonly number[]): {
   return { lx, ly, rx, ry };
 }
 
+/**
+ * Creates a StateChanger function from gamepad input
+ * 
+ * Converts gamepad state (buttons, D-pad, and analog sticks) into a function
+ * that can update Switch controller state. This enables direct gamepad-to-Switch
+ * input mapping.
+ * 
+ * @param gamepad - The gamepad object to read input from
+ * @returns StateChanger function that applies gamepad state to controller state
+ */
 export function stateChangerByGamepad(gamepad: Gamepad): StateChanger {
   const { pressed, released } = groupButtons(gamepad.buttons);
   const hat: Hat = identifyHat(gamepad.buttons);
