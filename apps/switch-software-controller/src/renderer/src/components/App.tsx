@@ -2,13 +2,16 @@ import path from 'node:path';
 import { app } from '@electron/remote';
 import { useCamera } from '@renderer/hooks';
 import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const dataDir = path.join(app.getPath('userData'), 'ssc-data');
 
 function App(): React.JSX.Element {
   const videoElementId = 'camera';
-  const video = document.getElementById(videoElementId) as HTMLVideoElement;
+  const video = useMemo(
+    () => document.getElementById(videoElementId) as HTMLVideoElement,
+    [],
+  );
 
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const { takeScreenshot, currentDevice, setCurrentDevice } = useCamera(video);
